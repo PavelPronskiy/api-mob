@@ -102,6 +102,7 @@ class prbClass
 	function __getNewsById($newsId)
 	{
 		$rc = new returnCodes();
+		$moduleParams = new JRegistry();
 		$db = &JFactory::getDBO();
 		$item = array();
 
@@ -117,7 +118,7 @@ class prbClass
 		$sql .= " WHERE id='240'";
 		$db->setQuery($sql);
 		$moduleParamsData = $db->loadAssoc();
-		$moduleParams = new JRegistry();
+
 		$moduleParams->loadString($moduleParamsData['params']);
 		$importantIdArray = $moduleParams->get('k2items');
 
@@ -205,9 +206,14 @@ class prbClass
 	{
 		$rm = explode('/', $REQUEST_URI_API_METHOD[0]);
 
-		//$rm_method = $rm[0];
-		//$rm_id = $rm[1];
-		//$rm_id_content = $rm[2];
+		/*
+		 * $rm[0] --- request uri method
+		 * $rm[1] --- id (json preview)
+		 * $rm[2] --- id (html preview)
+		 * /news/{id}
+		 * /news/{id}/content
+		 * 
+		*/
 
 		$prb = new prbClass();
 		$rc = new returnCodes();
