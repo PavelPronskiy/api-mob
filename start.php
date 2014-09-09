@@ -1,7 +1,6 @@
 <?
 /**
- * probirka app init, ver 0.10b 
- * 
+ * API, ver 0.12b
 **/
 
 define('_JEXEC', 1);
@@ -11,11 +10,14 @@ define('DATE_FORMAT', 'r');
 define('HOSTNAME', 'http://'.$_SERVER['HTTP_HOST']);
 define('URI_API_PREFIX', '/api/');
 
-error_reporting(0);
+error_reporting(9);
 
 require_once($_SERVER["DOCUMENT_ROOT"].'/configuration.php');
 require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
 require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
+
+
+
 
 jimport('joomla.filesystem.file');
 jimport('joomla.database.table');
@@ -25,12 +27,9 @@ jimport('joomla.application.component.helper');
 jimport('joomla.application.component.view');
 jimport('joomla.application.module.helper');
 
-
-
-error_reporting(9);
-
-$mainframe =& JFactory::getApplication('site');
-$mainframe->initialise();
+// load K2 model
+JLoader::register('K2HelperRoute', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'helpers'.DS.'route.php');
+JLoader::register('K2HelperUtilities', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'helpers'.DS.'utilities.php');
 
 
 class returnCodes
@@ -38,6 +37,7 @@ class returnCodes
 	public $incorrect_URI = array('code' => '1001', 'msg' => 'Incorrect URI');
 	public $invalid_URI = array('code' => '1002', 'msg' => 'Invalid URI');
 	public $news_not_found = array('code' => '1003', 'msg' => 'News not found');
+	public $timeline_params_empty = array('code' => '1004', 'msg' => 'Empty timeline params');
 }
 
 class prbClass
@@ -99,6 +99,57 @@ class prbClass
 		}
 	}
 
+	function __dataModelView($method, $format, $dataRow, $importantIdArray='')
+	{
+		// $method -> news,articles etc.
+		// $format -> type output: json, html
+		// $data   -> data array
+		// $importantIdArray   -> important id array
+
+
+		$rc = new returnCodes();
+		$item = array();
+		
+		switch($method)
+		{
+			case "news":
+				switch($format)
+				{
+					case "json":
+
+						if (is_array($dataRow))
+						{
+							$item['id'] = $dataRow['id'];
+							$item['title'] = $dataRow['title'];
+							$item['brief'] = str_replace(array("\r\n","\r"), "", strip_tags($dataRow['introtext']));
+							$item['createdAt'] = date(DATE_FORMAT, strtotime($dataRow['created']));
+							$item['updatedAt'] = date(DATE_FORMAT, strtotime($dataRow['modified']));
+							$item['imageURL'] = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow['id']).'_M.jpg';
+							$item['important'] = in_array($dataRow['id'], $importantIdArray, true) ? 'true' : 'false';
+							$item['shareURL'] = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow['id'].':'.$dataRow['alias'], $dataRow['catid'])));
+
+							header('Content-Type: application/json');
+							echo json_encode($item);
+						}
+					break;
+					case "html":
+						$tidy = new tidy();
+						$tidy->parseString(
+							$dataRow['introtext'].$dataRow['fulltext'],
+							array('show-body-only' => true, 'wrap' => false),
+						'utf8');
+
+						$tidy->cleanRepair();
+
+						header('Content-Type: text/html');
+						echo $tidy;
+					break;
+				}
+				
+			break;
+		}
+	}
+
 	function __getNewsById($newsId)
 	{
 		$rc = new returnCodes();
@@ -107,7 +158,7 @@ class prbClass
 		$item = array();
 
 		// get news (data array)
-		$sql = "SELECT `id`, `alias`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
+		$sql = "SELECT `id`, `alias`, `catid`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
 		$sql .= " WHERE id=".$newsId;
 		$sql .= " AND published='1'";
 		$db->setQuery($sql);
@@ -124,36 +175,7 @@ class prbClass
 
 		if (is_array($dataRow))
 		{
-			if (in_array($dataRow['id'], $importantIdArray, true))
-			{
-				$item_important = 'true';
-			}
-			else
-			{
-				$item_important = 'false';
-			}
-
-			$item['id'] = $dataRow['id'];
-			$item['title'] = $dataRow['title'];
-			$item['brief'] = str_replace(array("\r\n","\r"), "", strip_tags($dataRow['introtext']));
-			$item['createdAt'] = date(DATE_FORMAT, strtotime($dataRow['created']));
-			$item['updatedAt'] = date(DATE_FORMAT, strtotime($dataRow['modified']));
-			$item['imageURL'] = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow['id']).'_M.jpg';
-			$item['important'] = $item_important;
-			$item['shareURL'] = HOSTNAME.'/newsflash/'.$dataRow['id'].'-'.$dataRow['alias'].'.html';
-			
-			if (isset($_GET['debug']) && $_GET['debug'])
-			{
-				header('Content-Type: application/json');
-				print_r($item);
-				exit;
-			}
-			else
-			{
-				header('Content-Type: application/json');
-				echo json_encode($item);
-				exit;
-			}
+			prbClass::__dataModelView('news', 'json', $dataRow, $importantIdArray);
 		}
 		else
 		{
@@ -164,10 +186,10 @@ class prbClass
 	}
 
 	// fetch /news/{id}/content
+	// output: html intro and full text
 	function __getNewsByIdContent($newsId)
 	{
 		$rc = new returnCodes();
-		//$lc = new libClass();
 		$db = &JFactory::getDBO();
 		$item = array();
 
@@ -176,23 +198,11 @@ class prbClass
 		$sql .= " WHERE id=".$newsId;
 		$sql .= " AND published='1'";
 		$db->setQuery($sql);
-		$dr = $db->loadAssoc();
-		$tidy = new tidy();
-		$tidy->parseString(
-			$dr['introtext'].$dr['fulltext'],
-			array(
-				'show-body-only' => true,
-				'wrap' => false
-			),
-		'utf8');
+		$dataRow = $db->loadAssoc();
 
-		$tidy->cleanRepair();
-
-		if (is_array($dr))
+		if (is_array($dataRow))
 		{
-			header('Content-Type: text/html');
-			echo $tidy;
-			exit;
+			prbClass::__dataModelView('news', 'html', $dataRow);
 		}
 		else
 		{
@@ -202,9 +212,28 @@ class prbClass
 		}
 	}
 
+	function __getNewsTimeline($method, $params)
+	{
+		
+		$rc = new returnCodes();
+
+		if (!empty($params['since_id']) && !empty($params['max_id']) && !empty($params['count']))
+		{
+			// 
+			print_r($params);
+		}
+		else
+		{
+			header('Content-Type: application/json');
+			echo json_encode($rc->timeline_params_empty);
+			exit;
+		}
+
+		
+	}
+
 	function __methodExec($REQUEST_URI_API_METHOD, $REQUEST_URI_API_OPT)
 	{
-		$rm = explode('/', $REQUEST_URI_API_METHOD[0]);
 
 		/*
 		 * $rm[0] --- request uri method
@@ -215,34 +244,25 @@ class prbClass
 		 * 
 		*/
 
-		$prb = new prbClass();
 		$rc = new returnCodes();
+		$rm = explode('/', $REQUEST_URI_API_METHOD[0]);
+
 
 		switch($rm[0])
 		{
 			case "news":
 				// fetch /news/{id}
 				if (isset($rm[1]) && !isset($rm[2]) && is_numeric($rm[1]))
-				{
-					return $prb->__getNewsById($rm[1]);
-				}
+					return prbClass::__getNewsById($rm[1]);
 
 				// fetch /news/{id}/content
 				if (isset($rm[1]) && isset($rm[2]) && $rm[2] == 'content' && is_numeric($rm[1]))
-				{
-					return $prb->__getNewsByIdContent($rm[1]);
-				}
-
+					return prbClass::__getNewsByIdContent($rm[1]);
 				
-				/* $prb = new prbClass();
-				return $prb->__getNewsOrder(
-					3,
-					$REQUEST_URI_API_OPT['since_id'],
-					$REQUEST_URI_API_OPT['max_id'],
-					$REQUEST_URI_API_OPT['count']
-				); */
-
-				//print_r($rm);
+				// fetch timeline /news
+				// params: since_id, max_id, count
+				if (isset($REQUEST_URI_API_OPT['since_id']) && isset($REQUEST_URI_API_OPT['max_id']) && isset($REQUEST_URI_API_OPT['count']))
+					return prbClass::__getNewsTimeline($rm[0], $REQUEST_URI_API_OPT);
 
 				break;
 			default:
@@ -253,19 +273,18 @@ class prbClass
 	}
 }
 
+// joomla init
+$mainframe =& JFactory::getApplication('site');
+$mainframe->initialise();
 
-$prbClass = new prbClass();
-$prbClass->__validateReqURI($_SERVER['REQUEST_URI']);
-
-$REQUEST_URI_API = explode('?', $_SERVER['REQUEST_URI']);
-
-$execOutput = $prbClass->__methodExec(str_replace(URI_API_PREFIX, '', $REQUEST_URI_API), $_GET);
+prbClass::__validateReqURI($_SERVER['REQUEST_URI']);
+prbClass::__methodExec(str_replace(URI_API_PREFIX, '', explode('?', $_SERVER['REQUEST_URI'])), $_GET);
 
 if (isset($_GET['debug']) && $_GET['debug'])
 {
-	print_r($_GET);
+	//print_r($_GET);
 	echo "\n";
-	print_r($execOutput);
+	//print_r($execOutput);
 	exit;
 }
 
