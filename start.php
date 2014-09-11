@@ -1,6 +1,6 @@
 <?
 /**
- * API, ver 0.12b
+ * API, ver 0.13b
 **/
 
 define('_JEXEC', 1);
@@ -13,11 +13,8 @@ define('URI_API_PREFIX', '/api/');
 error_reporting(9);
 
 require_once($_SERVER["DOCUMENT_ROOT"].'/configuration.php');
-require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
-require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
-
-
-
+require_once(JPATH_BASE .DS.'includes'.DS.'defines.php');
+require_once(JPATH_BASE .DS.'includes'.DS.'framework.php');
 
 jimport('joomla.filesystem.file');
 jimport('joomla.database.table');
@@ -34,10 +31,13 @@ JLoader::register('K2HelperUtilities', JPATH_SITE.DS.'components'.DS.'com_k2'.DS
 
 class returnCodes
 {
-	public $incorrect_URI = array('code' => '1001', 'msg' => 'Incorrect URI');
-	public $invalid_URI = array('code' => '1002', 'msg' => 'Invalid URI');
-	public $news_not_found = array('code' => '1003', 'msg' => 'News not found');
-	public $timeline_params_empty = array('code' => '1004', 'msg' => 'Empty timeline params');
+	public $incorrect_URI = array('errors' => array('code' => '1001', 'message' => 'Incorrect URI'));
+	public $invalid_URI = array('errors' => array('code' => '1002', 'message' => 'Invalid URI'));
+	public $news_not_found = array('errors' => array('code' => '1003', 'message' => 'News not found'));
+	public $timeline_params_empty = array('errors' => array('code' => '1004', 'message' => 'Empty timeline params'));
+	public $timeline_params_not_defined = array('errors' => array('code' => '1005', 'message' => 'Timeline params not defined'));
+	public $timeline_params_invalid = array('errors' => array('code' => '1006', 'message' => 'Invalid timeline params'));
+	public $timeline_empty = array('errors' => array('code' => '1007', 'message' => 'Empty timeline items'));
 }
 
 class prbClass
@@ -46,46 +46,31 @@ class prbClass
 	var $database;
 	var $debug;
 
-	/* function __construct()
+	function __errorCodesModel($outputFormatType, $data)
 	{
-		$cfg = new JConfig();
-		if (!$this->connection = new PDO('mysql:host=' . $cfg->host . ';dbname=' . $cfg->db, $cfg->user, $cfg->password))
+
+		$rc = new returnCodes();
+
+		switch($outputFormatType)
 		{
-			$this->debug[] = "Error: ".$cfg->db;
+			case "json":
+
+				// set web server code status
+				switch($data['errors']['code'])
+				{
+					case "1003": header('HTTP/1.1 404 Not Found'); break;
+				}
+
+				
+				header('Content-Type: application/json');
+				echo json_encode($data);
+				exit;
+			break;
 		}
+
+		exit;
+
 	}
-
-	function __getNewsOrder($catid, $since_id, $max_id, $limit)
-	{
-		$db = &JFactory::getDBO();
-		$item = array();
-		$incrId = 1;
-		$sql = "SELECT `id`, `alias`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
-		$sql .= " WHERE catid=".$catid;
-		$sql .= " ORDER BY id DESC";
-
-		$db->setQuery($sql, 0, $limit);
-		$dataList = $db->loadAssocList();
-
-		if (is_array($dataList))
-		{
-			foreach($dataList as $a=>$b)
-			{
-				$item[$a]['id'] = $incrId;
-				$item[$a]['articleId'] = $b['id'];
-				$item[$a]['title'] = $b['title'];
-				$item[$a]['brief'] = str_replace(array("\r\n","\r"), "", strip_tags($b['introtext']));
-				$item[$a]['createdAt'] = date(DATE_FORMAT, strtotime($b['created']));
-				$item[$a]['updatedAt'] = date(DATE_FORMAT, strtotime($b['modified']));
-				$item[$a]['imageURL'] = JURI::root().'media/k2/items/cache/'.md5("Image".$b['id']).'_M.jpg';
-				$item[$a]['important'] = 'false';
-				$item[$a]['shareURL'] = $b['alias'];
-				$incrId++;
-			}
-
-			return $item;
-		}
-	} */
 
 	function __validateReqURI($REQUEST_URI_API)
 	{
@@ -93,9 +78,7 @@ class prbClass
 		$regex = "/[`'\"~!@# $*()<>,:;{}\|]/";
 		if (preg_match($regex, $REQUEST_URI_API))
 		{
-			header('Content-Type: application/json');
-			echo json_encode($rc->incorrect_URI);
-			exit;
+			prbClass::__errorCodesModel('json', $rc->incorrect_URI);
 		}
 	}
 
@@ -128,8 +111,7 @@ class prbClass
 							$item['important'] = in_array($dataRow['id'], $importantIdArray, true) ? 'true' : 'false';
 							$item['shareURL'] = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow['id'].':'.$dataRow['alias'], $dataRow['catid'])));
 
-							header('Content-Type: application/json');
-							echo json_encode($item);
+							return $item;
 						}
 					break;
 					case "html":
@@ -141,8 +123,7 @@ class prbClass
 
 						$tidy->cleanRepair();
 
-						header('Content-Type: text/html');
-						echo $tidy;
+						return $tidy;
 					break;
 				}
 				
@@ -175,13 +156,12 @@ class prbClass
 
 		if (is_array($dataRow))
 		{
-			prbClass::__dataModelView('news', 'json', $dataRow, $importantIdArray);
+			header('Content-Type: application/json');
+			echo json_encode(prbClass::__dataModelView('news', 'json', $dataRow, $importantIdArray));
 		}
 		else
 		{
-			header('Content-Type: application/json');
-			echo json_encode($rc->news_not_found);
-			exit;
+			prbClass::__errorCodesModel('json', $rc->news_not_found);
 		}
 	}
 
@@ -202,13 +182,12 @@ class prbClass
 
 		if (is_array($dataRow))
 		{
-			prbClass::__dataModelView('news', 'html', $dataRow);
+			header('Content-Type: text/html');
+			echo prbClass::__dataModelView('news', 'html', $dataRow);
 		}
 		else
 		{
-			header('Content-Type: application/json');
-			echo json_encode($rc->news_not_found);
-			exit;
+			prbClass::__errorCodesModel('json', $rc->news_not_found);
 		}
 	}
 
@@ -216,17 +195,66 @@ class prbClass
 	{
 		
 		$rc = new returnCodes();
+		$db = &JFactory::getDBO();
+		$item = array();
 
-		if (!empty($params['since_id']) && !empty($params['max_id']) && !empty($params['count']))
+		if (
+			!empty($params['since_id']) &&
+			!empty($params['max_id']) &&
+			!empty($params['count'])
+		)
 		{
-			// 
-			print_r($params);
+
+			if (
+				is_numeric($params['since_id']) &&
+				is_numeric($params['max_id']) &&
+				is_numeric($params['count'])
+			)
+			{
+
+				($params['max_id'] < $params['since_id']) ? $sql_sort = 'DESC' : $sql_sort = 'ASC';
+
+				$sql = "SELECT `id`, `alias`, `catid`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
+				$sql .= " WHERE id < ".$params['max_id'];
+				$sql .= " AND published='1'";
+				$sql .= " AND id > ".$params['since_id'];
+				$sql .= " AND catid='3'";
+				$sql .= " ORDER BY id ".$sql_sort;
+
+				$db->setQuery($sql, 0, $params['count']);
+				$dataArray = $db->loadAssocList();
+
+				if ($dataArray)
+				{
+					foreach($dataArray as $row)
+					{
+						$item[] = prbClass::__dataModelView('news', 'json', $row);
+					}
+
+					if (isset($_GET['debug']) && $_GET['debug'])
+					{
+						header('Content-Type: application/json');
+						print_r($item);
+					}
+					else
+					{
+						header('Content-Type: application/json');
+						echo json_encode($item);
+					}
+				}
+				else
+				{
+					prbClass::__errorCodesModel('json', $rc->timeline_empty);
+				}
+			}
+			else
+			{
+				prbClass::__errorCodesModel('json', $rc->timeline_params_invalid);
+			}
 		}
 		else
 		{
-			header('Content-Type: application/json');
-			echo json_encode($rc->timeline_params_empty);
-			exit;
+			prbClass::__errorCodesModel('json', $rc->timeline_params_empty);
 		}
 
 		
@@ -252,23 +280,38 @@ class prbClass
 		{
 			case "news":
 				// fetch /news/{id}
-				if (isset($rm[1]) && !isset($rm[2]) && is_numeric($rm[1]))
-					return prbClass::__getNewsById($rm[1]);
+				if (
+					isset($rm[1]) &&
+					!isset($rm[2]) &&
+					is_numeric($rm[1])
+				) return prbClass::__getNewsById($rm[1]);
 
 				// fetch /news/{id}/content
-				if (isset($rm[1]) && isset($rm[2]) && $rm[2] == 'content' && is_numeric($rm[1]))
-					return prbClass::__getNewsByIdContent($rm[1]);
+				if (
+					isset($rm[1]) &&
+					isset($rm[2]) &&
+					$rm[2] == 'content' &&
+					is_numeric($rm[1])
+				) return prbClass::__getNewsByIdContent($rm[1]);
 				
 				// fetch timeline /news
 				// params: since_id, max_id, count
-				if (isset($REQUEST_URI_API_OPT['since_id']) && isset($REQUEST_URI_API_OPT['max_id']) && isset($REQUEST_URI_API_OPT['count']))
+				if (
+					isset($REQUEST_URI_API_OPT['since_id']) &&
+					isset($REQUEST_URI_API_OPT['max_id']) &&
+					isset($REQUEST_URI_API_OPT['count'])
+				)
+				{
 					return prbClass::__getNewsTimeline($rm[0], $REQUEST_URI_API_OPT);
+				}
+				else
+				{
+					prbClass::__errorCodesModel('json', $rc->timeline_params_not_defined);
+				}
 
 				break;
 			default:
-				header('Content-Type: application/json');
-				echo json_encode($rc->invalid_URI);
-				exit;
+				prbClass::__errorCodesModel('json', $rc->invalid_URI);
 		}
 	}
 }
@@ -280,12 +323,12 @@ $mainframe->initialise();
 prbClass::__validateReqURI($_SERVER['REQUEST_URI']);
 prbClass::__methodExec(str_replace(URI_API_PREFIX, '', explode('?', $_SERVER['REQUEST_URI'])), $_GET);
 
-if (isset($_GET['debug']) && $_GET['debug'])
+/* if (isset($_GET['debug']) && $_GET['debug'])
 {
 	//print_r($_GET);
 	echo "\n";
 	//print_r($execOutput);
 	exit;
-}
+} */
 
 ?>
