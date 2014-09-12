@@ -1,7 +1,9 @@
 <?
 /**
- * API, ver 0.13b
+ * API, ver 0.14b
 **/
+
+error_reporting(9);
 
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
@@ -9,8 +11,6 @@ define('JPATH_BASE', $_SERVER["DOCUMENT_ROOT"]);
 define('DATE_FORMAT', 'r');
 define('HOSTNAME', 'http://'.$_SERVER['HTTP_HOST']);
 define('URI_API_PREFIX', '/api/');
-
-error_reporting(9);
 
 require_once($_SERVER["DOCUMENT_ROOT"].'/configuration.php');
 require_once(JPATH_BASE .DS.'includes'.DS.'defines.php');
@@ -78,23 +78,34 @@ class prbClass
 		$regex = "/[`'\"~!@# $*()<>,:;{}\|]/";
 		if (preg_match($regex, $REQUEST_URI_API))
 		{
-			prbClass::__errorCodesModel('json', $rc->incorrect_URI);
+			self::__errorCodesModel('json', $rc->incorrect_URI);
 		}
 	}
 
-	function __dataModelView($method, $format, $dataRow, $importantIdArray='')
+	function __dataModelView($method, $format='', $dataRow, $importantIdArray='')
 	{
 		// $method -> news,articles etc.
 		// $format -> type output: json, html
 		// $data   -> data array
 		// $importantIdArray   -> important id array
 
-
 		$rc = new returnCodes();
 		$item = array();
 		
 		switch($method)
 		{
+			case "article_types":
+				if (is_array($dataRow))
+				{
+					$item['id'] = $dataRow['id'];
+					$item['articleType'] = $dataRow['alias'];
+					$item['title'] = $dataRow['name'];
+				}
+
+				return $item;
+
+
+			break;
 			case "news":
 				switch($format)
 				{
@@ -157,11 +168,11 @@ class prbClass
 		if (is_array($dataRow))
 		{
 			header('Content-Type: application/json');
-			echo json_encode(prbClass::__dataModelView('news', 'json', $dataRow, $importantIdArray));
+			echo json_encode(self::__dataModelView('news', 'json', $dataRow, $importantIdArray));
 		}
 		else
 		{
-			prbClass::__errorCodesModel('json', $rc->news_not_found);
+			self::__errorCodesModel('json', $rc->news_not_found);
 		}
 	}
 
@@ -183,11 +194,11 @@ class prbClass
 		if (is_array($dataRow))
 		{
 			header('Content-Type: text/html');
-			echo prbClass::__dataModelView('news', 'html', $dataRow);
+			echo self::__dataModelView('news', 'html', $dataRow);
 		}
 		else
 		{
-			prbClass::__errorCodesModel('json', $rc->news_not_found);
+			self::__errorCodesModel('json', $rc->news_not_found);
 		}
 	}
 
@@ -228,7 +239,7 @@ class prbClass
 				{
 					foreach($dataArray as $row)
 					{
-						$item[] = prbClass::__dataModelView('news', 'json', $row);
+						$item[] = self::__dataModelView('news', 'json', $row);
 					}
 
 					if (isset($_GET['debug']) && $_GET['debug'])
@@ -244,20 +255,53 @@ class prbClass
 				}
 				else
 				{
-					prbClass::__errorCodesModel('json', $rc->timeline_empty);
+					self::__errorCodesModel('json', $rc->timeline_empty);
 				}
 			}
 			else
 			{
-				prbClass::__errorCodesModel('json', $rc->timeline_params_invalid);
+				self::__errorCodesModel('json', $rc->timeline_params_invalid);
 			}
 		}
 		else
 		{
-			prbClass::__errorCodesModel('json', $rc->timeline_params_empty);
+			self::__errorCodesModel('json', $rc->timeline_params_empty);
 		}
 
 		
+	}
+
+	function __getArticleTypes($exclude_article_types_array)
+	{
+		$rc = new returnCodes();
+		$db = &JFactory::getDBO();
+		$item = array();
+
+		// get categories (data array)
+		$sql = "SELECT `id`, `name`, `alias` FROM #__k2_categories";
+		$sql .= " WHERE parent='0'";
+		$sql .= " AND published='1'";
+		$db->setQuery($sql);
+		$dataArray = $db->loadAssocList();
+
+
+		foreach($dataArray as $row)
+		{
+			if (!in_array($row['id'], $exclude_article_types_array)) {
+				$item[] = self::__dataModelView('article_types','', $row);
+			}
+		}
+
+		if (isset($_GET['debug']) && $_GET['debug'])
+		{
+			header('Content-Type: application/json');
+			print_r($item);
+		}
+		else
+		{
+			header('Content-Type: application/json');
+			echo json_encode($item);
+		}
 	}
 
 	function __methodExec($REQUEST_URI_API_METHOD, $REQUEST_URI_API_OPT)
@@ -284,7 +328,7 @@ class prbClass
 					isset($rm[1]) &&
 					!isset($rm[2]) &&
 					is_numeric($rm[1])
-				) return prbClass::__getNewsById($rm[1]);
+				) return self::__getNewsById($rm[1]);
 
 				// fetch /news/{id}/content
 				if (
@@ -292,7 +336,7 @@ class prbClass
 					isset($rm[2]) &&
 					$rm[2] == 'content' &&
 					is_numeric($rm[1])
-				) return prbClass::__getNewsByIdContent($rm[1]);
+				) return self::__getNewsByIdContent($rm[1]);
 				
 				// fetch timeline /news
 				// params: since_id, max_id, count
@@ -302,16 +346,25 @@ class prbClass
 					isset($REQUEST_URI_API_OPT['count'])
 				)
 				{
-					return prbClass::__getNewsTimeline($rm[0], $REQUEST_URI_API_OPT);
+					return self::__getNewsTimeline($rm[0], $REQUEST_URI_API_OPT);
 				}
 				else
 				{
-					prbClass::__errorCodesModel('json', $rc->timeline_params_not_defined);
+					self::__errorCodesModel('json', $rc->timeline_params_not_defined);
 				}
 
 				break;
+			case "article_types":
+				$exclude_article_types_array = array(
+					'154','155', '145', '3', '34', '71', '44',
+					'43', '111', '133', '75', '60', '70', '41',
+					'52', '54', '98'
+				);
+
+				self::__getArticleTypes($exclude_article_types_array);
+			break;
 			default:
-				prbClass::__errorCodesModel('json', $rc->invalid_URI);
+				self::__errorCodesModel('json', $rc->invalid_URI);
 		}
 	}
 }
