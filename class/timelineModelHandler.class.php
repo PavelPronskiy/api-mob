@@ -15,18 +15,18 @@ class timelineModelViewer
 		else
 		{
 			/* max count = 100 */
-			if (is_int((int)$params['count']) && $params['count'] >= 100)
+			if ((int)$params['count'] && $params['count'] >= 100)
 				$params['count'] = MAX_COUNT_TIMELINE;
 		}
 
-		if (isset($params['since_id']) && is_int((int)$params['since_id']))
+		if (isset($params['since_id']) && (int)$params['since_id'])
 			$sql_timeline_params = " AND id < ".$params['since_id'];
 
-		if (isset($params['max_id']) && is_int((int)$params['max_id']))
+		if (isset($params['max_id']) && (int)$params['max_id'])
 			$sql_timeline_params = " AND id > ".$params['max_id'];
 
-		if (isset($params['since_id']) && is_int((int)$params['since_id']) &&
-			isset($params['max_id']) && is_int((int)$params['max_id']))
+		if (isset($params['since_id']) && (int)$params['since_id'] &&
+			isset($params['max_id']) && (int)$params['max_id'])
 			$sql_timeline_params = " AND id > ".$params['since_id']." AND id < ".$params['max_id'];
 
 		if (!isset($params['since_id']) && !isset($params['max_id']))

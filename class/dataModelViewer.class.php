@@ -93,11 +93,11 @@ class dataModelViewer
 			case "articles":
 				$item->id = $dataRow->id;
 				$item->title = $dataRow->title;
-				$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
+				if ($method == 'news') $item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
 				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
-				$item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
+				if ($method == 'news') $item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
 				$item->shareURL = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
 				return $item;
 			break;
@@ -110,7 +110,7 @@ class dataModelViewer
 	 * @param type $params 
 	 * @return type
 	 */
-	static function previewById($articleId)
+	static function previewById($method, $articleId)
 	{
 		$ji = new joomlaImports();
 		$dv = new debugViewer();
@@ -129,7 +129,7 @@ class dataModelViewer
 		{
 			header('Content-Type: application/json');
 			$dv->view($dataObject);
-			echo json_encode(self::view('news', '', $dataObject, $ji->getImportantIDSArray()));
+			echo json_encode(self::view($method, '', $dataObject, $ji->getImportantIDSArray()));
 		}
 		else
 		{
@@ -137,7 +137,7 @@ class dataModelViewer
 		}
 	}
 
-	static function getNewsByIdContent($articleId)
+	static function getArticleByIdContent($articleId)
 	{
 		$dv = new debugViewer();
 		$rc = new returnCodesViewer();
@@ -200,6 +200,35 @@ class dataModelViewer
 			$dv->view($item);
 			echo json_encode($item);
 		}
+	}
+
+	static function getArticleById($articleId)
+	{
+		$dv = new debugViewer();
+		$rc = new returnCodesViewer();
+		$db = &JFactory::getDBO();
+		$tidy = new tidy();
+		$item = array();
+
+		// get news (data array)
+		$sql = "SELECT `id`, `alias`, `catid`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
+		$sql .= " WHERE id=".$articleId;
+		$sql .= " AND published='1'";
+		$db->setQuery($sql);
+		$dataObject = $db->loadObject();
+
+		if ($dataObject)
+		{
+			header('Content-Type: application/json');
+			$dv->view($dataObject);
+			echo json_encode(self::view('articles', '', $dataObject, ''));
+		}
+		else
+		{
+			$rc->rcode('json', $rc->news_not_found);
+		}
+
+
 	}
 
 }

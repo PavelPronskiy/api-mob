@@ -22,15 +22,14 @@ class apiRuntime
 		switch($rm[0])
 		{
 			case "news":
-			case "articles":
 				/* view preview article by id */
-				if (isset($rm[1]) && is_int((int)$rm[1]) && !isset($rm[2]))
-					return $dm->previewById($rm[1]);
+				if (isset($rm[1]) && (int)$rm[1] && !isset($rm[2]))
+					return $dm->previewById($rm[0], (int)$rm[1]);
 
 
 				/* view article by id html output */
-				if (isset($rm[1]) && isset($rm[2]) && $rm[2] == 'content' && is_int((int)$rm[1]))
-					return $dm->getNewsByIdContent($rm[1]);
+				if (isset($rm[1]) && isset($rm[2]) && $rm[2] == 'content' && (int)$rm[1])
+					return $dm->getArticleByIdContent($rm[1]);
 				
 
 				if (isset($REQUEST_URI_API_OPT['since_id']) OR
@@ -55,9 +54,38 @@ class apiRuntime
 				);
 
 				return $dm->getArticleTypes($exclude_article_types_array);
+			break;
+			case "articles":
+				/**
+				 * $rm[1] - articleType or (int)id 
+				 */
+
+
+				/* by id */
+				if (isset($rm[1]) && (int)$rm[1] && !isset($rm[2]))
+					return $dm->previewById($rm[0], (int)$rm[1]);
+
+
+				/* by id content */
+				if (isset($rm[1]) && (int)$rm[1] && $rm[2] == 'content')
+					return $dm->getArticleByIdContent((int)$rm[1]);
+
+
+				/* by article_type */
+				if (isset($rm[1]) && (string)$rm[1])
+					return print_r('did ');
+
+
+				/* by article_type */
+				/* if (isset($rm[1]) && $rm[1]))
+				{
+					return print_r('article_type');
+				} */
+				
 
 			break;
-			default: $rc->rcode('json', $rc->invalid_URI);
+			default:
+				$rc->rcode('json', $rc->invalid_URI);
 		}
 	}
 }
