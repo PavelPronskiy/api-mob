@@ -84,14 +84,14 @@ class dataModelViewer
 		switch($method)
 		{
 			case "article_types":
-				$item->id = $dataRow->id;
+				$item->id = (int)$dataRow->id;
 				$item->articleType = $dataRow->alias;
 				$item->title = $dataRow->name;
 				return $item;
 			break;
 			case "news":
 			case "articles":
-				$item->id = $dataRow->id;
+				$item->id = (int)$dataRow->id;
 				$item->title = $dataRow->title;
 				if ($method == 'news') $item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
