@@ -2,6 +2,10 @@
 
 class joomlaImports
 {
+	/**
+	 * get important news/articles
+	 * @return type
+	 */
 	static function getImportantIDSArray()
 	{
 		$db = &JFactory::getDBO();
@@ -19,7 +23,11 @@ class joomlaImports
 
 	}
 
-
+	/**
+	 * uri validation
+	 * @param type $REQUEST_URI_API 
+	 * @return type
+	 */
 	static function validateRequestURI($REQUEST_URI_API)
 	{
 		$rc = new returnCodesViewer();

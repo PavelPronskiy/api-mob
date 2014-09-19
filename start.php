@@ -1,6 +1,6 @@
 <?
 /**
- * API, ver 0.17b
+ * API, ver 0.18b
 **/
 
 error_reporting(9);

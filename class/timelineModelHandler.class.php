@@ -3,6 +3,12 @@
 class timelineModelViewer
 {
 
+	/**
+	 * sql select params
+	 * @param type $catid 
+	 * @param type $params 
+	 * @return type
+	 */
 	static function construct_TimelineSQLParams($catid, $params='')
 	{
 

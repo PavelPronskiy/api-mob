@@ -1,17 +1,19 @@
 <?
 class apiRuntime
 {
+	/**
+	 * Description
+	 * $rm[0] --- request uri method
+	 * $rm[1] --- id (json preview)
+	 * $rm[2] --- id (html preview)
+	 * /data_type/{id}
+	 * /data_type/{id}/content
+	 * @param type $REQUEST_URI_API_METHOD 
+	 * @param type $REQUEST_URI_API_OPT 
+	 * @return type
+	 */
 	public function initialise($REQUEST_URI_API_METHOD, $REQUEST_URI_API_OPT)
 	{
-
-		/*
-		 * $rm[0] --- request uri method
-		 * $rm[1] --- id (json preview)
-		 * $rm[2] --- id (html preview)
-		 * /data_type/{id}
-		 * /data_type/{id}/content
-		 * 
-		*/
 
 		$dv = new debugViewer();
 		$dm = new dataModelViewer();

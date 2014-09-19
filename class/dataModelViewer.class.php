@@ -2,82 +2,16 @@
 
 class dataModelViewer
 {
-
-	public function prettyPrint($json)
-	{
-		$result = '';
-		$level = 0;
-		$in_quotes = false;
-		$in_escape = false;
-		$ends_line_level = NULL;
-		$json_length = strlen( $json );
-
-		for( $i = 0; $i < $json_length; $i++ )
-		{
-			$char = $json[$i];
-			$new_line_level = NULL;
-			$post = "";
-			if( $ends_line_level !== NULL )
-			{
-				$new_line_level = $ends_line_level;
-				$ends_line_level = NULL;
-			}
-			if ($in_escape)
-			{
-				$in_escape = false;
-			}
-			else if($char === '"')
-			{
-				$in_quotes = !$in_quotes;
-			}
-			else if (!$in_quotes)
-			{
-				switch($char) {
-					case '}': case ']':
-						$level--;
-						$ends_line_level = NULL;
-						$new_line_level = $level;
-						break;
-
-					case '{': case '[':
-						$level++;
-					case ',':
-						$ends_line_level = $level;
-						break;
-
-					case ':':
-						$post = " ";
-						break;
-
-					case " ": case "\t": case "\n": case "\r":
-						$char = "";
-						$ends_line_level = $new_line_level;
-						$new_line_level = NULL;
-						break;
-				}
-			}
-			else if ($char === '\\')
-			{
-				$in_escape = true;
-			}
-
-			if($new_line_level !== NULL)
-			{
-				$result .= "\n".str_repeat("\t", $new_line_level);
-			}
-
-			$result .= $char.$post;
-		}
-
-		return $result;
-	}
-
+	/**
+	 * format data
+	 * @param type $method 
+	 * @param type $format 
+	 * @param type $dataRow 
+	 * @param type $importantIdArray 
+	 * @return type
+	 */
 	public function view($method, $format='', $dataRow, $importantIdArray='')
 	{
-		// $method -> news,articles etc.
-		// $format -> type output: json, html
-		// $dataRow   -> data array
-		// $importantIdArray   -> important ids array
 
 		$item = new stdClass();
 		
@@ -105,7 +39,7 @@ class dataModelViewer
 	}
 
 	/**
-	 * timeline article by id preview
+	 * article by id preview
 	 * @param type $articleId
 	 * @param type $params 
 	 * @return type
@@ -137,6 +71,11 @@ class dataModelViewer
 		}
 	}
 
+	/**
+	 * get article by id introtext + fulltext
+	 * @param type $articleId 
+	 * @return type
+	 */
 	static function getArticleByIdContent($articleId)
 	{
 		$dv = new debugViewer();
@@ -171,7 +110,11 @@ class dataModelViewer
 		}
 	}
 
-
+	/**
+	 * get article categories
+	 * @param type $excludeArray 
+	 * @return type
+	 */
 	static function getArticleTypes($excludeArray)
 	{
 		$dv = new debugViewer();
@@ -200,35 +143,6 @@ class dataModelViewer
 			$dv->view($item);
 			echo json_encode($item);
 		}
-	}
-
-	static function getArticleById($articleId)
-	{
-		$dv = new debugViewer();
-		$rc = new returnCodesViewer();
-		$db = &JFactory::getDBO();
-		$tidy = new tidy();
-		$item = array();
-
-		// get news (data array)
-		$sql = "SELECT `id`, `alias`, `catid`, `title`, `introtext`, `created`, `modified` FROM #__k2_items";
-		$sql .= " WHERE id=".$articleId;
-		$sql .= " AND published='1'";
-		$db->setQuery($sql);
-		$dataObject = $db->loadObject();
-
-		if ($dataObject)
-		{
-			header('Content-Type: application/json');
-			$dv->view($dataObject);
-			echo json_encode(self::view('articles', '', $dataObject, ''));
-		}
-		else
-		{
-			$rc->rcode('json', $rc->news_not_found);
-		}
-
-
 	}
 
 }
