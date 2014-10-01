@@ -90,12 +90,13 @@ class apiRuntime
 				if (isset($rm[1]) && (int)$rm[1] && !isset($rm[2]))
 					return $dm->previewById($rm[0], (int)$rm[1]);
 
+
 				if (isset($REQUEST_URI_API_OPT['since_id']) OR
 					isset($REQUEST_URI_API_OPT['max_id']) OR
 					isset($REQUEST_URI_API_OPT['count']))
 				{
 					/* view list objects */
-					return $tl->viewTimelineWebina('webinars', 71, $REQUEST_URI_API_OPT);
+					return $tl->viewTimeline('webinars', 71, $REQUEST_URI_API_OPT);
 				}
 				else
 				{
