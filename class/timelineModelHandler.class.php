@@ -71,7 +71,8 @@ class timelineModelViewer
 		{
 			foreach($dataObject as $a=>$b)
 			{
-				$item[] = $mv->view($model, '', $b, $ji->getImportantIDSArray());
+				$retn = $mv->view($model, '', $b, $ji->getImportantIDSArray());
+				if ($retn) $item[] = $retn;
 			}
 			
 			header('Content-Type: application/json');

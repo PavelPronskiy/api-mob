@@ -3,17 +3,31 @@
 class dataModelViewer
 {
 
-	/**
-	 *  Check if input string is a valid YouTube URL
-	 *  and try to extract the YouTube Video ID from it.
-	 *  @param   $url   string   The string that shall be checked.
-	 *  @return  mixed           Returns YouTube Video ID, or (boolean) false.
-	 */        
+
+     
 	function parse_yturl($url) 
 	{
-		$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
+
+		//$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
+		//$pattern = '/embed\/([^\&\?\/]+)/';
+		$pattern = '/<iframe.*src=\"(.*)?\".*><\/iframe>/isU';
+		//$pattern = '#^(?:https?://)?(?:www\.)?(?:m\.)?(?:youtu\.be/|youtube\.com(?:/embed/|/v/|/watch\?v=|/watch\?.+&v=))([\w-]{11})(?:.+)?$#x';
+		//$pattern = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 		preg_match($pattern, $url, $matches);
-		return (isset($matches[1])) ? $matches[1] : false;
+
+		if (isset($matches[1]))
+		{
+			$replace_url = str_replace('?feature=player_detailpage','', $matches[1]);
+
+			if (preg_match('/youtube/', $replace_url, $matchez))
+			{
+				$replace_url = preg_replace('#^(?:https?://)?(?:www\.)?youtube\.com/embed/#x','', $replace_url);
+				return $replace_url;
+			}
+
+				
+			
+		}
 	}
 
 	/**
@@ -35,8 +49,8 @@ class dataModelViewer
 				$item->id = (int)$dataRow->id;
 				$item->articleType = $dataRow->alias;
 				$item->title = $dataRow->name;
+
 				return $item;
-			break;
 			case "news":
 			case "articles":
 				$item->id = (int)$dataRow->id;
@@ -47,15 +61,16 @@ class dataModelViewer
 				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
 				if ($method == 'news') $item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
 				$item->shareURL = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+
 				return $item;
-			break;
 			case "webinars":
 				$item->id = (int)$dataRow->id;
 				$item->ytId = self::parse_yturl($dataRow->introtext);
 				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-				return $item;
-			break;
+
+				if ($item->ytId)
+					return $item;
 		}
 	}
 
