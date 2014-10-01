@@ -2,6 +2,20 @@
 
 class dataModelViewer
 {
+
+	/**
+	 *  Check if input string is a valid YouTube URL
+	 *  and try to extract the YouTube Video ID from it.
+	 *  @param   $url   string   The string that shall be checked.
+	 *  @return  mixed           Returns YouTube Video ID, or (boolean) false.
+	 */        
+	function parse_yturl($url) 
+	{
+		$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
+		preg_match($pattern, $url, $matches);
+		return (isset($matches[1])) ? $matches[1] : false;
+	}
+
 	/**
 	 * format data
 	 * @param type $method 
@@ -33,6 +47,13 @@ class dataModelViewer
 				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
 				if ($method == 'news') $item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
 				$item->shareURL = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+				return $item;
+			break;
+			case "webinars":
+				$item->id = (int)$dataRow->id;
+				$item->ytId = self::parse_yturl($dataRow->introtext);
+				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
+				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
 				return $item;
 			break;
 		}

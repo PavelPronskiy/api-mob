@@ -55,11 +55,12 @@ class timelineModelViewer
 	 * @param type $params 
 	 * @return type
 	 */
-	static function viewTimeline($catid, $params='')
+	static function viewTimeline($model, $catid, $params='')
 	{
 		$ji = new joomlaImports();
 		$dv = new debugViewer();
 		$rc = new returnCodesViewer();
+		$mv = new dataModelViewer();
 		$db = &JFactory::getDBO();
 		$item = array();
 		$SQLParams = self::construct_TimelineSQLParams($catid, $params);
@@ -70,7 +71,7 @@ class timelineModelViewer
 		{
 			foreach($dataObject as $a=>$b)
 			{
-				$item[] = dataModelViewer::view('news', '', $b, $ji->getImportantIDSArray());
+				$item[] = $mv->view($model, '', $b, $ji->getImportantIDSArray());
 			}
 			
 			header('Content-Type: application/json');
