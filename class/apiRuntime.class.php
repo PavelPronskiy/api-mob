@@ -74,14 +74,16 @@ class apiRuntime
 
 				/* by article_type */
 				if (isset($rm[1]) && (string)$rm[1])
-					return print_r('did ');
-
-
-				/* by article_type */
-				/* if (isset($rm[1]) && $rm[1]))
 				{
-					return print_r('article_type');
-				} */
+					if (isset($REQUEST_URI_API_OPT['since_id']) OR
+						isset($REQUEST_URI_API_OPT['max_id']) OR
+						isset($REQUEST_URI_API_OPT['count']))
+					{
+						/* view list objects */
+						return $tl->viewArticleTypeTimeline('articles', (string)$rm[1], $REQUEST_URI_API_OPT);
+					}
+
+				}
 
 			break;
 			case "webinars":

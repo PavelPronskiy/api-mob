@@ -49,6 +49,22 @@ class timelineModelViewer
 		return $sql_select.$sql_timeline_params.$sort_limit;
 	}
 
+	static function getCategoryIdByAlias($catAlias)
+	{
+
+		$db = &JFactory::getDBO();
+
+		$sql = "SELECT `id` FROM #__k2_categories";
+		$sql .= " WHERE alias='".$catAlias."'";
+		$sql .= " AND published='1'";
+		$sql .= " AND parent='0'";
+
+		$db->setQuery($sql);
+		$return = $db->loadResult();
+		return $return;
+	}
+
+
 	/**
 	 * timeline list
 	 * @param type $catid 
@@ -85,7 +101,43 @@ class timelineModelViewer
 		}
 	}
 
+	/**
+	 * timeline article types list
+	 * @param type $catid 
+	 * @param type $params 
+	 * @return type
+	 */
+	static function viewArticleTypeTimeline($model, $catAlias, $params='')
+	{
+		$ji = new joomlaImports();
+		$dv = new debugViewer();
+		$rc = new returnCodesViewer();
+		$mv = new dataModelViewer();
+		$db = &JFactory::getDBO();
+		$item = array();
+		$catid = self::getCategoryIdByAlias($catAlias);
+		$SQLParams = self::construct_TimelineSQLParams($catid, $params);
 
+		$db->setQuery($SQLParams);
+		$dataObject = $db->loadObjectList();
+
+		if ($dataObject)
+		{
+			foreach($dataObject as $a=>$b)
+			{
+				$retn = $mv->view($model, '', $b, '');
+				if ($retn) $item[] = $retn;
+			}
+			
+			header('Content-Type: application/json');
+			$dv->view($item);
+			echo json_encode($item);
+		}
+		else
+		{
+			$rc->rcode('json', $rc->timeline_empty);
+		}
+	}
 }
 
 ?>
