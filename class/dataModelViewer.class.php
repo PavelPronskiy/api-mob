@@ -52,15 +52,25 @@ class dataModelViewer
 
 				return $item;
 			case "news":
-			case "articles":
 				$item->id = (int)$dataRow->id;
 				$item->title = $dataRow->title;
-				if ($method == 'news') $item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
+				$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
 				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
-				if ($method == 'news') $item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
+				$item->important = in_array($dataRow->id, $importantIdArray, true) ? 'true' : 'false';
 				$item->shareURL = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+
+				return $item;
+
+			case "articles":
+				$item->id = (int)$dataRow->id;
+				$item->title = $dataRow->title;
+				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
+				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
+				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+				$item->shareURL = HOSTNAME.'/'.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+				$item->articleTypeId = (int)$dataRow->catid;
 
 				return $item;
 			case "webinars":
