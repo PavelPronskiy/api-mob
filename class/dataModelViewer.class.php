@@ -66,6 +66,7 @@ class dataModelViewer
 			case "articles":
 				$item->id = (int)$dataRow->id;
 				$item->title = $dataRow->title;
+				$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 				$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 				$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
 				$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
