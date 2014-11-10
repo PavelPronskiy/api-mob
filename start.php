@@ -1,50 +1,49 @@
 <?
 /**
- * API, ver 0.19 beta
+ * API, ver 0.36b
 **/
 
 error_reporting(9);
 
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
+define('URI_API_PREFIX', DS.'api'.DS);
 define('JPATH_BASE', $_SERVER["DOCUMENT_ROOT"]);
-define('DATE_FORMAT', 'r');
 define('HOSTNAME', 'http://'.$_SERVER['HTTP_HOST']);
-define('URI_API_PREFIX', '/api/');
-define('MAX_COUNT_TIMELINE', '5');
+define('API_CLASS_PATH', JPATH_BASE.URI_API_PREFIX.'class'.DS);
+define('DATE_FORMAT', 'r');
+define('MAX_COUNT_TIMELINE', 5);
+define('MAX_ID_TIMELINE', 10000000);
+define('SINCE_ID_TIMELINE', 0);
+define('COUNT_LIMIT_TIMELINE', 100);
 
-require_once($_SERVER["DOCUMENT_ROOT"].'/configuration.php');
-require_once(JPATH_BASE .DS.'includes'.DS.'defines.php');
-require_once(JPATH_BASE .DS.'includes'.DS.'framework.php');
+define('NEWS_K2_CATEGORY_ID', 3);
+define('WEBINARS_K2_CATEGORY_ID', 71);
+define('CLINIC_REGIONS_K2_CATEGORY_ID', 156);
 
-jimport('joomla.filesystem.file');
-jimport('joomla.database.table');
-jimport('joomla.application.component.controller');
-jimport('joomla.application.component.model');
-jimport('joomla.application.component.helper');
-jimport('joomla.application.component.view');
-jimport('joomla.application.module.helper');
+define('ARTICLE_TYPES_ID', '88,89,90,35,255,92,37,91,36,94,95,153,195,51,39');
 
-// load necessary models
+require_once(JPATH_BASE.DS.'includes'.DS.'defines.php');
+require_once(JPATH_BASE.DS.'includes'.DS.'framework.php');
+
+// registering classes
 JLoader::register('K2HelperRoute', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'helpers'.DS.'route.php');
-JLoader::register('K2HelperUtilities', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'helpers'.DS.'utilities.php');
-JLoader::register('returnCodesViewer', JPATH_SITE.DS.'api'.DS.'class'.DS.'returnCodes.class.php');
-JLoader::register('dataModelViewer', JPATH_SITE.DS.'api'.DS.'class'.DS.'dataModelViewer.class.php');
-JLoader::register('timelineModelViewer', JPATH_SITE.DS.'api'.DS.'class'.DS.'timelineModelHandler.class.php');
-JLoader::register('debugViewer', JPATH_SITE.DS.'api'.DS.'class'.DS.'debugViewer.class.php');
-JLoader::register('joomlaImports', JPATH_SITE.DS.'api'.DS.'class'.DS.'joomlaImports.class.php');
-JLoader::register('apiRuntime', JPATH_SITE.DS.'api'.DS.'class'.DS.'apiRuntime.class.php');
+JLoader::register('CodesExceptionHandler', API_CLASS_PATH.'returnCodesHandler.class.php');
+JLoader::register('clinicsModelHelper', API_CLASS_PATH.'clinicsModelHelper.class.php');
+JLoader::register('dataModelViewer', API_CLASS_PATH.'dataModelViewer.class.php');
+JLoader::register('debugViewer', API_CLASS_PATH.'debugViewer.class.php');
+JLoader::register('joomlaImports', API_CLASS_PATH.'joomlaImports.class.php');
+JLoader::register('articlesHelper', API_CLASS_PATH.'articlesHelper.class.php');
+JLoader::register('K2Helper', API_CLASS_PATH.'K2Helper.class.php');
+JLoader::register('APIRouter', API_CLASS_PATH.'APIRouter.class.php');
 
-// validate URI
-joomlaImports::validateRequestURI($_SERVER['REQUEST_URI']);
 
 // joomla init
 $mainframe =& JFactory::getApplication('site');
 $mainframe->initialise();
 
-$apiRequest = str_replace(URI_API_PREFIX, '', explode('?', $_SERVER['REQUEST_URI']));
 
-// api init
-apiRuntime::initialise($apiRequest, $_GET);
+
+APIRouter::route();
 
 ?>

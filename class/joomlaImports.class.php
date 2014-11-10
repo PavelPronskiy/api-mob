@@ -28,15 +28,15 @@ class joomlaImports
 	 * @param type $REQUEST_URI_API 
 	 * @return type
 	 */
-	static function validateRequestURI($REQUEST_URI_API)
+	/* static function validateRequestURI($REQUEST_URI_API)
 	{
 		$rc = new returnCodesViewer();
-		$regex = "/[`'\"~!@# $*()<>,:;{}\|]/";
+		$regex = "/[`'\"~!@# $*()<>,:;\+\-{}\|]/";
 		if (preg_match($regex, $REQUEST_URI_API))
 		{
 			$rc->rcode('json', $rc->incorrect_URI);
 		}
-	}
+	} */
 
 }
 
