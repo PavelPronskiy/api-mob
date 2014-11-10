@@ -60,7 +60,7 @@ class dataModelViewer
 					$item->businessHours = K2Helper::getExtrafields(11, $dataRow->extra_fields);
 					$item->location->latitude = K2Helper::getExtrafields(1, $dataRow->extra_fields);
 					$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
-					$item->since_hits = $dataRow->hits;
+					$item->since_hits = (int)$dataRow->hits;
 					break;
 				case "regions":
 					$item->id = (int)$dataRow->id;
