@@ -60,6 +60,17 @@ class APIRouter
 				return $returnMethod;
 			}
 
+			// content example: /methodType/id/about
+			if (isset($pathMethods[1]) && filter_var($pathMethods[1], FILTER_VALIDATE_INT) &&
+				isset($pathMethods[2]) && $pathMethods[2] == 'about' && $pathMethods[2] != DS)
+			{
+				$returnMethod->contentId = $pathMethods[1];
+				$returnMethod->pathRoute = 'about';
+				$returnMethod->dataTypeFormat = 'html';
+				return $returnMethod;
+			}
+
+
 			// timeline params construct
 			if (
 				(isset($pathMethods[0]) || isset($pathMethods[1])) &&
@@ -98,7 +109,6 @@ class APIRouter
 				return $returnMethod;
 			}
 
-
 			// empty exception
 			if (!isset($returnMethod->pathRoute))
 			throw new CodesExceptionHandler(1006);
@@ -130,7 +140,7 @@ class APIRouter
 				case "timeline": 		return articlesHelper::getTimeLine($routeObjects);
 			}
 		}
-		catch (\CodesExceptionHandler $e)
+		catch (CodesExceptionHandler $e)
 		{
 			die($e->view($e->getMessage()));
 		}

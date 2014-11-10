@@ -1,9 +1,9 @@
 <?
 /**
- * API, ver 0.36b
+ * API, ver 0.37b
 **/
 
-error_reporting(9);
+error_reporting(E_ALL);
 
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
@@ -16,10 +16,12 @@ define('MAX_COUNT_TIMELINE', 5);
 define('MAX_ID_TIMELINE', 10000000);
 define('SINCE_ID_TIMELINE', 0);
 define('COUNT_LIMIT_TIMELINE', 100);
+define('CLINICS_SINCE_HITS_TIMELINE', 1000000);
 
 define('NEWS_K2_CATEGORY_ID', 3);
 define('WEBINARS_K2_CATEGORY_ID', 71);
 define('CLINIC_REGIONS_K2_CATEGORY_ID', 156);
+define('K2_GALLERY_PATH', '/media/k2/galleries/');
 
 define('ARTICLE_TYPES_ID', '88,89,90,35,255,92,37,91,36,94,95,153,195,51,39');
 

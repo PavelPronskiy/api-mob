@@ -74,7 +74,7 @@ class articlesHelper
 		if (isset($data->categoryId))
 			$data->objectList = K2Helper::getK2TimeLineObjects($data);
 
-		if ($data->objectList)
+		if (isset($data->objectList))
 			dataModelViewer::dataView($data);
 	}
 

@@ -64,68 +64,45 @@ class K2Helper
 	}
 
 
-	static function getK2ContentById($id)
+	static function getGallery($id)
 	{
-		$db = &JFactory::getDBO();
-		$sql = "
-		SELECT 
-			`id`,
-			`alias`,
-			`catid`,
-			`title`,
-			`introtext`,
-			`fulltext`,
-			`created`,
-			`modified`
-		FROM #__k2_items";
-		$sql .= " WHERE id=".$id;
-		$sql .= " AND published='1'";
-		$db->setQuery($sql);
-		return $db->loadObject();
-	}
 
-	static function getK2DataTimeLineByCategoryId($data)
-	{
-		$db = &JFactory::getDBO();
-		$sqlQueryParams = '';
+		$galleryPath = K2_GALLERY_PATH.$id;
 
+		if (is_dir(JPATH_BASE.$galleryPath))
+		{
+			$files = scandir(JPATH_BASE.$galleryPath); 
 
-
-		/* max count = 100 */
-		if ($data->pathParams->count > COUNT_LIMIT_TIMELINE)
-			$data->pathParams->count = MAX_COUNT_TIMELINE;
-
-		if (isset($data->pathParams->since_id))
-			$sqlQueryParams = " AND id < ".$data->pathParams->since_id;
-
-		if (isset($data->pathParams->max_id))
-			$sqlQueryParams = " AND id > ".$data->pathParams->max_id;
-
-		if (isset($data->pathParams->since_id) && isset($data->pathParams->max_id))
-			$sqlQueryParams = " AND id > ".$data->pathParams->since_id." AND id < ".$data->pathParams->max_id;
-
-		if (!isset($data->pathParams->since_id) && !isset($data->pathParams->max_id))
-			$sqlQueryParams = '';
-
-
-		$sql = "SELECT
-			`id`, `alias`, `catid`, `title`, `introtext`, `created`, `modified`
-		FROM
-			#__k2_items
-		WHERE
-			catid=".$data->categoryId;
-		
-		$sql .= " AND published=1";
-
-		$sort = " ORDER BY id DESC";
-		$limit = " LIMIT 0,".$data->pathParams->count;
-
-		$x = $db->setQuery($sql.$sqlQueryParams.$sort.$limit);
-
-		$items = $db->loadObjectList();
+			foreach ($files as $key => $file) 
+			{ 
+				if (!in_array($file, array(".","..")))
+				{ 
+					$items[] = HOSTNAME.K2_GALLERY_PATH.$file;
+				} 
+			} 
+		}
 
 		if ($items)
 			return $items;
+		else
+			return false;
+	}
+
+	static function getK2ContentById($id)
+	{
+		$db = &JFactory::getDBO();
+
+		$sql = "SELECT 
+			a.id, a.alias, a.catid, a.title, a.introtext, a.fulltext,
+			a.gallery, a.extra_fields, a.hits, a.created, a.modified,
+			c.name AS catName
+		FROM #__k2_items AS a 
+		LEFT JOIN #__k2_categories AS c ON (a.catid=c.id)
+		WHERE a.id=$id
+		AND a.published=1";
+
+		$db->setQuery($sql);
+		return $db->loadObject();
 	}
 
 	static function getK2TimeLineObjects($data)

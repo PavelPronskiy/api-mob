@@ -6,19 +6,20 @@ class CodesExceptionHandler extends Exception
 	public function view($errorCodeId)
 	{
 
+
 		//$output = new stdClass;
 		//$output->errors = '';
 
 		$errorsArray = array(
-			array('1001', 'Incorrect URI111'),
+			array('1001', 'Incorrect URI'),
 			array('1002', 'Invalid URI'),
 			array('1003', 'Items not found'),
 			array('1004', 'Empty timeline params'),
 			array('1005', 'Timeline params not defined'),
 			array('1006', 'Invalid timeline params'),
 			array('1007', 'Empty timeline items'),
-			array('1008', 'Internal error')
-			array('1009', 'Item not found')
+			array('1008', 'Internal error'),
+			array('1009', 'Item not found'),
 			array('1010', 'Clinics not found')
 		);
 	

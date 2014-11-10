@@ -41,26 +41,50 @@ class dataModelViewer
 
 		$item = new stdClass();
 		$items = array();
+		$countObjects = count($objects->objectList);
 
 		foreach($objects->objectList as $dataRow)
 		{
 			switch($objects->section)
 			{
 				case "clinics":
-					$item->id = (int)$dataRow->id;
-					$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
-					$item->title = $dataRow->title;
-					$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
-					$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-					$item->regionId = '"'.$dataRow->catid.'"';
-					$item->regionTitle = '"'.$dataRow->catName.'"';
-					$item->phoneNumber = K2Helper::getExtrafields(5, $dataRow->extra_fields);
-					$item->adress = K2Helper::getExtrafields(7, $dataRow->extra_fields);
-					$item->webURL = K2Helper::getExtrafields(9, $dataRow->extra_fields);
-					$item->businessHours = K2Helper::getExtrafields(11, $dataRow->extra_fields);
-					$item->location->latitude = K2Helper::getExtrafields(1, $dataRow->extra_fields);
-					$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
-					$item->since_hits = (int)$dataRow->hits;
+					switch ($objects->pathRoute)
+					{
+						case "brief":
+							$item->id = (int)$dataRow->id;
+							$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+							$item->title = $dataRow->title;
+							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
+							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
+							$item->regionId = '"'.$dataRow->catid.'"';
+							$item->regionTitle = '"'.$dataRow->catName.'"';
+							$item->phoneNumber = K2Helper::getExtrafields(5, $dataRow->extra_fields);
+							$item->adress = K2Helper::getExtrafields(7, $dataRow->extra_fields);
+							$item->webURL = K2Helper::getExtrafields(9, $dataRow->extra_fields);
+							$item->photoURLs = K2Helper::getGallery($dataRow->id);
+							$item->businessHours = K2Helper::getExtrafields(11, $dataRow->extra_fields);
+							$item->location->latitude = K2Helper::getExtrafields(1, $dataRow->extra_fields);
+							$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
+							$item->since_hits = (int)$dataRow->hits;
+						break;
+						default:
+							$item->id = (int)$dataRow->id;
+							$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+							$item->title = $dataRow->title;
+							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
+							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
+							$item->regionId = '"'.$dataRow->catid.'"';
+							$item->regionTitle = '"'.$dataRow->catName.'"';
+							$item->phoneNumber = K2Helper::getExtrafields(5, $dataRow->extra_fields);
+							$item->adress = K2Helper::getExtrafields(7, $dataRow->extra_fields);
+							$item->webURL = K2Helper::getExtrafields(9, $dataRow->extra_fields);
+							$item->businessHours = K2Helper::getExtrafields(11, $dataRow->extra_fields);
+							$item->location->latitude = K2Helper::getExtrafields(1, $dataRow->extra_fields);
+							$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
+							$item->since_hits = (int)$dataRow->hits;
+						break;
+					}
+
 					break;
 				case "regions":
 					$item->id = (int)$dataRow->id;
@@ -104,6 +128,13 @@ class dataModelViewer
 					}
 				break;
 			}
+
+
+			if ($countObjects == 1)
+			{
+				return $item;
+			}
+
 
 			if (isset($item))
 			{
