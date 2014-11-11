@@ -107,8 +107,6 @@ class clinicsModelHelper
 				$objects->sqlQueryReturn = $db->setQuery($sql);
 				$objects->objectList = $db->loadObjectList();
 
-				// header('Content-Type: application/json');
-				// print_r($objects);
 
 				if ($objects->objectList)
 					dataModelViewer::dataView($objects);

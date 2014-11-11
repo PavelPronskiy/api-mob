@@ -15,6 +15,7 @@ class APIRouter
 			$pathMethods = array_filter(explode(DS, str_replace(URI_API_PREFIX, '', $path)));
 			$getImportantIDSArray = joomlaImports::getImportantIDSArray();
 
+
 			// query vars
 			parse_str($_SERVER['QUERY_STRING'], $parse_str);
 			if (isset($parse_str) && count($parse_str))
@@ -26,11 +27,7 @@ class APIRouter
 
 			// example: methodType/categoryAlias
 			// example: methodType/categoryAlias?params
-			if (
-				isset($pathMethods[0]) &&
-				isset($pathMethods[1]) &&
-				!filter_var($pathMethods[1], FILTER_VALIDATE_INT)
-			)
+			if ( isset($pathMethods[0]) && isset($pathMethods[1]) && (filter_var($pathMethods[1], FILTER_VALIDATE_INT) === false) )
 			{
 				$returnMethod->categoryId = K2Helper::getCategoryIdByAlias($pathMethods[1]);
 				$returnMethod->pathRoute = 'timeline';
@@ -42,7 +39,10 @@ class APIRouter
 			}
 
 			// brief example: /methodType/id
-			if ((isset($pathMethods[1]) && filter_var($pathMethods[1], FILTER_VALIDATE_INT)) && !isset($pathMethods[2]))
+			if (
+				(isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) ) &&
+				!isset($pathMethods[2])
+			)
 			{
 				$returnMethod->contentId = $pathMethods[1];
 				$returnMethod->pathRoute = 'brief';
@@ -51,7 +51,7 @@ class APIRouter
 			}
 
 			// content example: /methodType/id/content
-			if (isset($pathMethods[1]) && filter_var($pathMethods[1], FILTER_VALIDATE_INT) &&
+			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
 				isset($pathMethods[2]) && $pathMethods[2] == 'content' && $pathMethods[2] != DS)
 			{
 				$returnMethod->contentId = $pathMethods[1];
@@ -61,7 +61,7 @@ class APIRouter
 			}
 
 			// content example: /methodType/id/about
-			if (isset($pathMethods[1]) && filter_var($pathMethods[1], FILTER_VALIDATE_INT) &&
+			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
 				isset($pathMethods[2]) && $pathMethods[2] == 'about' && $pathMethods[2] != DS)
 			{
 				$returnMethod->contentId = $pathMethods[1];
