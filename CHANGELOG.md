@@ -1,5 +1,6 @@
 ## 0.39b (11.11.2014)
   - Исправлено поведение FILTER_VALIDATE_INT в APIRouter
+  - Исправления в clinicsModelHelper
 
 ## 0.38b (11.11.2014)
   - Исправления в dataModelViewer
