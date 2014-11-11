@@ -17,6 +17,7 @@ define('MAX_ID_TIMELINE', 10000000);
 define('SINCE_ID_TIMELINE', 0);
 define('COUNT_LIMIT_TIMELINE', 100);
 define('CLINICS_SINCE_HITS_TIMELINE', 1000000);
+define('K2_ITEMS_IMAGES_PATH', '/media/k2/items/cache/');
 
 define('NEWS_K2_CATEGORY_ID', 3);
 define('WEBINARS_K2_CATEGORY_ID', 71);

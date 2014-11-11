@@ -82,10 +82,10 @@ class K2Helper
 			} 
 		}
 
-		if ($items)
+		if (isset($items))
 			return $items;
 		else
-			return false;
+			return NULL;
 	}
 
 	static function getK2ContentById($id)
@@ -98,7 +98,7 @@ class K2Helper
 			c.name AS catName
 		FROM #__k2_items AS a 
 		LEFT JOIN #__k2_categories AS c ON (a.catid=c.id)
-		WHERE a.id=$id
+		WHERE a.id={$id}
 		AND a.published=1";
 
 		$db->setQuery($sql);
@@ -181,7 +181,7 @@ class K2Helper
 		//print_r($data);
 
 		if (!$data)
-			return false;
+			return NULL;
 
 		foreach($data as $k => $x)
 		{
@@ -191,21 +191,22 @@ class K2Helper
 				{
 					switch ($x->id)
 					{
-						case 1: if (isset($x->value) AND !empty($x->value)) $items = '"'.$x->value.'"'; break; // latitude
-						case 2: if (isset($x->value) AND !empty($x->value)) $items = '"'.$x->value.'"'; break; // longitude
-						case 5: if (isset($x->value) AND !empty($x->value)) $items = '"'.$x->value.'"'; break; // phoneNumber
-						case 7: if (isset($x->value) AND !empty($x->value)) $items = '"'.$x->value.'"'; break; // address
-						case 9: if (isset($x->value[1]) AND !empty($x->value[1])) $items = '"'.$x->value[1].'"'; break; // webURL
-						case 11: if (isset($x->value) AND !empty($x->value)) $items = '"'.$x->value.'"'; break; // businessHours
+						case 1: if (isset($x->value) AND !empty($x->value)) $items = $x->value; else $items = NULL; break; // latitude
+						case 2: if (isset($x->value) AND !empty($x->value)) $items = $x->value; else $items = NULL; break; // longitude
+						case 5: if (isset($x->value) AND !empty($x->value)) $items = $x->value; else $items = NULL; break; // phoneNumber
+						case 7: if (isset($x->value) AND !empty($x->value)) $items = $x->value; else $items = NULL; break; // address
+						case 9: if (isset($x->value[1]) AND !empty($x->value[1])) $items = $x->value[1]; else $items = NULL; break; // webURL
+						case 11: if (isset($x->value) AND !empty($x->value)) $items = $x->value; else $items = NULL; break; // businessHours
 						//default: $items = $x->value; break;
 					}
-
-					
 				}
 			}
 		}
 
-		return $items;
+		if ($items)
+			return $items;
+		else
+			return NULL;
 	}
 
 

@@ -52,12 +52,12 @@ class dataModelViewer
 					{
 						case "brief":
 							$item->id = (int)$dataRow->id;
-							$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-							$item->regionId = '"'.$dataRow->catid.'"';
-							$item->regionTitle = '"'.$dataRow->catName.'"';
+							$item->regionId = $dataRow->catid;
+							$item->regionTitle = $dataRow->catName;
 							$item->phoneNumber = K2Helper::getExtrafields(5, $dataRow->extra_fields);
 							$item->adress = K2Helper::getExtrafields(7, $dataRow->extra_fields);
 							$item->webURL = K2Helper::getExtrafields(9, $dataRow->extra_fields);
@@ -69,12 +69,12 @@ class dataModelViewer
 						break;
 						default:
 							$item->id = (int)$dataRow->id;
-							$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-							$item->regionId = '"'.$dataRow->catid.'"';
-							$item->regionTitle = '"'.$dataRow->catName.'"';
+							$item->regionId = $dataRow->catid;
+							$item->regionTitle = $dataRow->catName;
 							$item->phoneNumber = K2Helper::getExtrafields(5, $dataRow->extra_fields);
 							$item->adress = K2Helper::getExtrafields(7, $dataRow->extra_fields);
 							$item->webURL = K2Helper::getExtrafields(9, $dataRow->extra_fields);
@@ -103,7 +103,7 @@ class dataModelViewer
 					$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 					$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 					$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-					$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+					$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
 					if (isset($objects->importantIdCollection)) $item->important = in_array($dataRow->id, $objects->importantIdCollection, true) ? 'true' : 'false';
 					$item->shareURL = HOSTNAME.DS.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
 					break;
@@ -113,7 +113,7 @@ class dataModelViewer
 					$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 					$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 					$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-					$item->imageURL = HOSTNAME.'/media/k2/items/cache/'.md5("Image".$dataRow->id).'_M.jpg';
+					$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
 					$item->shareURL = HOSTNAME.DS.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
 					$item->articleTypeId = (int)$dataRow->catid;
 					break;
