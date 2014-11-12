@@ -13,7 +13,7 @@ define('HOSTNAME', 'http://'.$_SERVER['HTTP_HOST']);
 define('API_CLASS_PATH', JPATH_BASE.URI_API_PREFIX.'class'.DS);
 define('DATE_FORMAT', 'r');
 define('MAX_COUNT_TIMELINE', 5);
-define('MAX_ID_TIMELINE', 10000000);
+define('MAX_ID_TIMELINE', 100000000);
 define('SINCE_ID_TIMELINE', 0);
 define('COUNT_LIMIT_TIMELINE', 100);
 define('CLINICS_SINCE_HITS_TIMELINE', 1000000);
@@ -24,8 +24,10 @@ define('WEBINARS_K2_CATEGORY_ID', 71);
 define('CLINIC_REGIONS_K2_CATEGORY_ID', 156);
 define('K2_GALLERY_PATH', '/media/k2/galleries/');
 
+
 define('ARTICLE_TYPES_ID', '88,89,90,35,255,92,37,91,36,94,95,153,195,51,39');
 
+require_once(JPATH_BASE.URI_API_PREFIX.'.rating-db-settings.php');
 require_once(JPATH_BASE.DS.'includes'.DS.'defines.php');
 require_once(JPATH_BASE.DS.'includes'.DS.'framework.php');
 
@@ -38,6 +40,7 @@ JLoader::register('debugViewer', API_CLASS_PATH.'debugViewer.class.php');
 JLoader::register('joomlaImports', API_CLASS_PATH.'joomlaImports.class.php');
 JLoader::register('articlesHelper', API_CLASS_PATH.'articlesHelper.class.php');
 JLoader::register('K2Helper', API_CLASS_PATH.'K2Helper.class.php');
+JLoader::register('RatingHelper', API_CLASS_PATH.'RatingHelper.class.php');
 JLoader::register('APIRouter', API_CLASS_PATH.'APIRouter.class.php');
 
 

@@ -82,6 +82,9 @@ class APIRouter
 			)
 			{
 
+				if ($returnMethod->pathParams->since_id == '-1')
+					$returnMethod->pathParams->since_id = MAX_ID_TIMELINE;
+
 				$returnMethod->categoryId = K2Helper::getMappingTypes($pathMethods[0]);
 				$returnMethod->pathRoute = 'timeline';
 				$returnMethod->dataTypeFormat = 'json';

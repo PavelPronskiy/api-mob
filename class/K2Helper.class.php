@@ -19,7 +19,9 @@ class K2Helper
 
 		$db->setQuery($sql);
 		$return = $db->loadResult();
-		
+
+	
+
 		// empty exception
 		if ($return)
 			return $return;
@@ -111,6 +113,7 @@ class K2Helper
 		$sqlQueryParams = '';
 		$sqlQueryImportant = '';
 
+
 		/* max count = 100 */
 		if ($objects->pathParams->count > COUNT_LIMIT_TIMELINE)
 			$objects->pathParams->count = MAX_COUNT_TIMELINE;
@@ -122,20 +125,31 @@ class K2Helper
 			$sqlQueryParams = "AND a.id > ".$objects->pathParams->max_id;
 
 		if (isset($objects->pathParams->since_id) && isset($objects->pathParams->max_id))
-			$sqlQueryParams = "AND a.id > ".$objects->pathParams->since_id." AND a.id <= ".$objects->pathParams->max_id;
+			$sqlQueryParams = "AND a.id > ".$objects->pathParams->since_id." AND a.id < ".$objects->pathParams->max_id;
 
 		if (!isset($objects->pathParams->since_id) && !isset($objects->pathParams->max_id))
 			$sqlQueryParams = '';
 
 
-
 		// sort by since_id > 0 AND max_id == 0
 		if (isset($objects->pathParams->max_id) && isset($objects->pathParams->since_id))
 		{
-			if ( ($objects->pathParams->max_id == 0) && ($objects->pathParams->since_id > 0)) // sort by since_id
+			if ( ($objects->pathParams->max_id == 0) && ($objects->pathParams->since_id > 0) )
 			{
-				$sqlQueryParams = "AND a.id < {$objects->pathParams->since_id}";
+				$sqlQueryParams = "AND a.id < {$objects->pathParams->since_id}"; // sort by since_id
 			}
+		}
+
+		if (isset($objects->pathParams->since_id) && $objects->pathParams->since_id == '-1')
+		{
+			$sqlQueryParams = "AND a.id < {MAX_ID_TIMELINE}"; // sort by since_id
+		}
+
+
+		// important ids not defined in module NEWS_IMPORTANT
+		if (!is_array($objects->importantIdCollection))
+		{
+			$objects->pathParams->important = 0;
 		}
 
 		if (isset($objects->pathParams->important) && $objects->pathParams->important == 1)
@@ -147,16 +161,21 @@ class K2Helper
 		{
 			$sqlWhere = "a.catid={$objects->categoryId}";
 		}
+		
+		// clinics listing by clinics categories
+		if ( (isset($objects->SQL_ClinicsCategories_ID)) && !empty($objects->SQL_ClinicsCategories_ID) )
+		{
+			$sqlWhere = "a.catid IN ({$objects->SQL_ClinicsCategories_ID})";
+		}
 
 		// sql query collect
 		$sql = "SELECT 
 			a.id, a.alias, a.catid, a.title, a.introtext,
 			a.created, a.modified, a.featured, a.hits,
-			a.extra_fields, c.name AS catName
+			a.extra_fields, b.name AS catName
 		FROM #__k2_items AS a
-		LEFT JOIN #__k2_categories AS c ON (a.catid=c.id)
-		WHERE {$sqlWhere}
-		{$sqlQueryParams}
+		LEFT JOIN #__k2_categories AS b ON (a.catid=b.id)
+		WHERE {$sqlWhere} {$sqlQueryParams}
 		AND a.published=1
 		ORDER BY a.id DESC
 		LIMIT 0,{$objects->pathParams->count}";
@@ -164,7 +183,8 @@ class K2Helper
 		$objects->sqlQueryReturn = $db->setQuery($sql);
 		$objects->objectList = $db->loadObjectList();
 
-
+		//header('Content-Type: application/json');
+		//print_r($objects->sqlQueryReturn);
 
 
 		if ($objects->objectList)

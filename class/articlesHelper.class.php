@@ -51,6 +51,7 @@ class articlesHelper
 	 */
 	static function getContentData($data)
 	{
+
 		if (isset($data->contentId))
 			$data->objectList = K2Helper::getK2ContentById($data->contentId);
 		else

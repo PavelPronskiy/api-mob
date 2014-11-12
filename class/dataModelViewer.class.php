@@ -67,9 +67,10 @@ class dataModelViewer
 							$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
 							$item->since_hits = (int)$dataRow->hits;
 						break;
-						default:
+						case "timeline":
 							$item->id = (int)$dataRow->id;
 							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
+							$item->rating = RatingHelper::getRating($dataRow);
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));

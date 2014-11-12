@@ -6,8 +6,8 @@ class debugViewer
 	{
 		if (isset($_GET['debug']) && $_GET['debug'])
 		{
-			print_r($data);
-			print_r($dbReturn);
+			var_export($data);
+			var_export($dbReturn);
 			exit;
 		}
 		
