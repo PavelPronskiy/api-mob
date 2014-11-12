@@ -19,8 +19,8 @@ class RatingHelper
 		$item = new stdClass();
 		$items = array();
 
-		$item->currentValue = '';
-		$item->dailyChange = '';
+		$item->currentValue = '0.0';
+		$item->dailyChange = (int)0;
 
 		return $item;
 

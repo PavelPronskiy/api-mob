@@ -1,6 +1,6 @@
 <?
 /**
- * API, ver 0.40b
+ * API, ver 0.41b
 **/
 
 error_reporting(E_ALL);

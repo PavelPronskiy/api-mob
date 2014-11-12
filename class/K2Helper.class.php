@@ -114,6 +114,9 @@ class K2Helper
 		$sqlQueryImportant = '';
 
 
+		if (!isset($objects->pathParams->count))
+			$objects->pathParams->count = MAX_COUNT_TIMELINE;
+
 		/* max count = 100 */
 		if ($objects->pathParams->count > COUNT_LIMIT_TIMELINE)
 			$objects->pathParams->count = MAX_COUNT_TIMELINE;
