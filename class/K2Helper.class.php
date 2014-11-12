@@ -29,12 +29,12 @@ class K2Helper
 	}
 
 
-	static function getCategoryTree($data)
+	static function getCategoryTree($objects)
 	{
 
 		$db = &JFactory::getDBO();
 
-		if (!$data->categoryId)
+		if (!$objects->categoryId)
 		throw new CodesExceptionHandler(1006);
 
 		$sql = "SELECT 
@@ -46,17 +46,17 @@ class K2Helper
 		ON
 			a.id=b.catid
 		WHERE
-			a.parent={$data->categoryId}
+			a.parent={$objects->categoryId}
 		AND
 			a.published=1
 		GROUP BY
 			a.id";
 
-		$data->sqlQueryReturn = $db->setQuery($sql);
-		$data->objectList = $db->loadObjectList();
+		$objects->sqlQueryReturn = $db->setQuery($sql);
+		$objects->objectList = $db->loadObjectList();
 
-		if ($data->objectList)
-			return $data->objectList;
+		if ($objects->objectList)
+			return $objects->objectList;
 		else
 			throw new CodesExceptionHandler(1006);
 
@@ -105,63 +105,76 @@ class K2Helper
 		return $db->loadObject();
 	}
 
-	static function getK2TimeLineObjects($data)
+	static function getK2TimeLineObjects($objects)
 	{
 		$db = &JFactory::getDBO();
 		$sqlQueryParams = '';
+		$sqlQueryImportant = '';
 
 		/* max count = 100 */
-		if ($data->pathParams->count > COUNT_LIMIT_TIMELINE)
-			$data->pathParams->count = MAX_COUNT_TIMELINE;
+		if ($objects->pathParams->count > COUNT_LIMIT_TIMELINE)
+			$objects->pathParams->count = MAX_COUNT_TIMELINE;
 
-		if (isset($data->pathParams->since_id))
-			$sqlQueryParams = " AND a.id < ".$data->pathParams->since_id;
+		if (isset($objects->pathParams->since_id))
+			$sqlQueryParams = "AND a.id < ".$objects->pathParams->since_id;
 
-		if (isset($data->pathParams->max_id))
-			$sqlQueryParams = " AND a.id > ".$data->pathParams->max_id;
+		if (isset($objects->pathParams->max_id))
+			$sqlQueryParams = "AND a.id > ".$objects->pathParams->max_id;
 
-		if (isset($data->pathParams->since_id) && isset($data->pathParams->max_id))
-			$sqlQueryParams = " AND a.id > ".$data->pathParams->since_id." AND a.id < ".$data->pathParams->max_id;
+		if (isset($objects->pathParams->since_id) && isset($objects->pathParams->max_id))
+			$sqlQueryParams = "AND a.id > ".$objects->pathParams->since_id." AND a.id <= ".$objects->pathParams->max_id;
 
-		if (!isset($data->pathParams->since_id) && !isset($data->pathParams->max_id))
+		if (!isset($objects->pathParams->since_id) && !isset($objects->pathParams->max_id))
 			$sqlQueryParams = '';
 
 
+
+		// sort by since_id > 0 AND max_id == 0
+		if (isset($objects->pathParams->max_id) && isset($objects->pathParams->since_id))
+		{
+			if ( ($objects->pathParams->max_id == 0) && ($objects->pathParams->since_id > 0)) // sort by since_id
+			{
+				$sqlQueryParams = "AND a.id < {$objects->pathParams->since_id}";
+			}
+		}
+
+		if (isset($objects->pathParams->important) && $objects->pathParams->important == 1)
+		{
+			$collectSQLImportant = implode(',', $objects->importantIdCollection);
+			$sqlWhere = "a.id IN ({$collectSQLImportant})";
+		}
+		else
+		{
+			$sqlWhere = "a.catid={$objects->categoryId}";
+		}
+
+		// sql query collect
 		$sql = "SELECT 
 			a.id, a.alias, a.catid, a.title, a.introtext,
 			a.created, a.modified, a.featured, a.hits,
 			a.extra_fields, c.name AS catName
-		FROM #__k2_items AS a";
+		FROM #__k2_items AS a
+		LEFT JOIN #__k2_categories AS c ON (a.catid=c.id)
+		WHERE {$sqlWhere}
+		{$sqlQueryParams}
+		AND a.published=1
+		ORDER BY a.id DESC
+		LIMIT 0,{$objects->pathParams->count}";
 
-		$sql .= " LEFT JOIN #__k2_categories AS c ON (a.catid=c.id)";
+		$objects->sqlQueryReturn = $db->setQuery($sql);
+		$objects->objectList = $db->loadObjectList();
 
-		switch($data->section)
-		{
-			case "clinics" :
-				$sql .= " WHERE `catid` IN (".clinicsModelHelper::getClinicsCategoriesId($data).")";
-				break;
-			default:
-				$sql .= " WHERE `catid`=".$data->categoryId;
-				break;
-		}
-		
-		$sql .= " AND a.published=1";
-		$sql .= " {$sqlQueryParams}";
-		$sql .= " ORDER BY a.id DESC";
-		$sql .= " LIMIT 0,{$data->pathParams->count}";
 
-		$data->sqlQueryReturn = $db->setQuery($sql);
-		$data->objectList = $db->loadObjectList();
 
-		if ($data->objectList)
-			return $data->objectList;
+
+		if ($objects->objectList)
+			return $objects->objectList;
 	}
 
-
-	static function getMappingTypes($data)
+	static function getMappingTypes($objects)
 	{
 		// mapping alias == id
-		switch($data)
+		switch($objects)
 		{
 			case "news": 			return NEWS_K2_CATEGORY_ID; 		// id from k2 categories -> news
 			case "webinars": 		return WEBINARS_K2_CATEGORY_ID; 	// id from k2 categories -> webinars
@@ -175,15 +188,13 @@ class K2Helper
 	static function getExtrafields($extraFieldId, $extraFields)
 	{
 
-		$data = json_decode($extraFields);
+		$objects = json_decode($extraFields);
 		$items = '';
 
-		//print_r($data);
-
-		if (!$data)
+		if (!$objects)
 			return NULL;
 
-		foreach($data as $k => $x)
+		foreach($objects as $k => $x)
 		{
 			if (isset($x->id))
 			{
