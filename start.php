@@ -1,6 +1,6 @@
 <?
 /**
- * API, ver 0.41b
+ * API, ver 0.42b
 **/
 
 error_reporting(E_ALL);
@@ -30,9 +30,13 @@ define('ARTICLE_TYPES_ID', '88,89,90,35,255,92,37,91,36,94,95,153,195,51,39');
 require_once(JPATH_BASE.URI_API_PREFIX.'.rating-db-settings.php');
 require_once(JPATH_BASE.DS.'includes'.DS.'defines.php');
 require_once(JPATH_BASE.DS.'includes'.DS.'framework.php');
+//require_once (JPATH_BASE.DS.'libraries'.DS.'joomla'.DS.'database'.DS.'database.php'); 
+//require_once(JPATH_BASE.DS.'libraries'.DS.'import.php'); 
+//require_once (JPATH_BASE.DS.'libraries'.DS.'joomla'.DS.'factory.php'); 
 
 // registering classes
 JLoader::register('K2HelperRoute', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'helpers'.DS.'route.php');
+JLoader::register('JDatabase', JPATH_BASE.DS.'libraries'.DS.'joomla'.DS.'database'.DS.'database.php');
 JLoader::register('CodesExceptionHandler', API_CLASS_PATH.'returnCodesHandler.class.php');
 JLoader::register('clinicsModelHelper', API_CLASS_PATH.'clinicsModelHelper.class.php');
 JLoader::register('dataModelViewer', API_CLASS_PATH.'dataModelViewer.class.php');

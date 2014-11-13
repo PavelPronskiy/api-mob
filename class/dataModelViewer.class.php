@@ -53,6 +53,7 @@ class dataModelViewer
 						case "brief":
 							$item->id = (int)$dataRow->id;
 							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
+							$item->rating = RatingHelper::getRatingValues($dataRow->id);
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
@@ -70,7 +71,7 @@ class dataModelViewer
 						case "timeline":
 							$item->id = (int)$dataRow->id;
 							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
-							$item->rating = RatingHelper::getRating($dataRow);
+							$item->rating = RatingHelper::getRatingValues($dataRow->id);
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));

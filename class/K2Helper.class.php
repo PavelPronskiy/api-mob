@@ -210,7 +210,6 @@ class K2Helper
 	// returned extrafields by extrafield id
 	static function getExtrafields($extraFieldId, $extraFields)
 	{
-
 		$objects = json_decode($extraFields);
 		$items = '';
 
@@ -225,12 +224,12 @@ class K2Helper
 				{
 					switch ($x->id)
 					{
-						case 1: if (isset($x->value) AND !empty($x->value)) $items = $x->value; break; // latitude
-						case 2: if (isset($x->value) AND !empty($x->value)) $items = $x->value; break; // longitude
-						case 5: if (isset($x->value) AND !empty($x->value)) $items = $x->value; break; // phoneNumber
-						case 7: if (isset($x->value) AND !empty($x->value)) $items = $x->value; break; // address
+						case 1: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // latitude
+						case 2: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // longitude
+						case 5: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // phoneNumber
+						case 7: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // address
 						case 9: if (isset($x->value[1]) AND !empty($x->value[1])) $items = $x->value[1]; break; // webURL
-						case 11: if (isset($x->value) AND !empty($x->value)) $items = $x->value; break; // businessHours
+						case 11: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // businessHours
 						//default: $items = $x->value; break;
 					}
 				}
@@ -240,7 +239,7 @@ class K2Helper
 		if ($items)
 			return $items;
 		else
-			return NULL;
+			return 'Не заполнено';
 	}
 
 

@@ -9,22 +9,17 @@ class RatingHelper
 {
 
 	/**
-	 * rating heper
-	 * @param type $objects
-	 * @return type item
+	 * Выводит object с двумя значениями:
+	 *   currentValue
+	 *   dailyChange
 	 */
-	static function getRating($objects)
+	static function getRatingValues($clinic_id)
 	{
-
 		$item = new stdClass();
-		$items = array();
-
-		$item->currentValue = '0.0';
-		$item->dailyChange = (int)0;
-
+		$itemRating = clinicsModelHelper::getClinicsRating($clinic_id);
+		$item->currentValue = isset($itemRating->currentValue) ? $itemRating->currentValue : 0;
+		$item->dailyChange = isset($item->dailyChange) ? (int)$itemRating->dailyChange : 0;
 		return $item;
-
-		//$countObjects = count($objects->objectList);
 	}
 
 }

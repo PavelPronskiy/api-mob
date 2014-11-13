@@ -18,6 +18,47 @@ class clinicsModelHelper
 	}
 
 	/**
+	 * get rating clinics by id
+	 * @param type 
+	 * @return type
+	 */
+
+	static function getClinicsRating($clinic_id)
+	{
+		$db = &JFactory::getDBO();
+
+		$sql = "SELECT 
+			a.clinic_id, a.clinic_nid, a.currentValue, a.dailyChange
+		FROM #__clinics_rating AS a 
+		LEFT JOIN #__k2_categories AS c ON (a.clinic_id=c.id)
+		WHERE a.clinic_id={$clinic_id}";
+
+		$db->setQuery($sql);
+		return $db->loadObject();
+	}
+
+	/**
+	 * get all rating clinics by id
+	 * @param type 
+	 * @return type
+	 */
+
+	static function getAllClinicsRating()
+	{
+		$db = &JFactory::getDBO();
+
+		$sql = "SELECT 
+			a.clinic_id, a.clinic_nid, a.currentValue, a.dailyChange
+		FROM #__clinics_rating AS a 
+		LEFT JOIN #__k2_categories AS c ON (a.clinic_id=c.id)
+		ORDER BY a.clinic_id";
+
+		$db->setQuery($sql);
+		return $db->loadObjectList();
+	}
+
+
+	/**
 	 * get regions by clinics
 	 * @param type 
 	 * @return type
@@ -61,17 +102,6 @@ class clinicsModelHelper
 
 			break;
 			case "timeline":
-
-				/* if (!isset($objects->pathParams->since_hits))
-					$objects->pathParams->since_hits = CLINICS_SINCE_HITS_TIMELINE; */
-
-
-				/* if (isset($objects->pathParams->since_id))
-					$sqlTimeline = " AND a.id < ".$objects->pathParams->since_id;
-
-				if (!isset($objects->pathParams->since_id) && !isset($objects->pathParams->max_id))
-					$sqlTimeline = '';
- 				*/
 
 				$objects->objectsCategory = K2Helper::getCategoryTree($objects);
 
