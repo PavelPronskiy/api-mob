@@ -45,7 +45,6 @@ API-Mob
 
 Список всех регионов
 	`GET http://api.project/regions`
-
 Список всех клиник
 	`GET http://api.project/clinics?count={count}&since_id={since_id}&since_hits={since_hits}`
 
