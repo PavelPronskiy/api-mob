@@ -45,6 +45,7 @@ JLoader::register('K2HelperRoute', JPATH_SITE.DS.'components'.DS.'com_k2'.DS.'he
 // registering this classes
 JLoader::register('CodesExceptionHandler', API_CLASS_PATH.'returnCodesHandler.class.php');
 JLoader::register('newsModelHelper', API_CLASS_PATH.'newsModelHelper.class.php');
+JLoader::register('webinarsModelHelper', API_CLASS_PATH.'webinarsModelHelper.class.php');
 JLoader::register('clinicsModelHelper', API_CLASS_PATH.'clinicsModelHelper.class.php');
 JLoader::register('dataModelViewer', API_CLASS_PATH.'dataModelViewer.class.php');
 JLoader::register('debugViewer', API_CLASS_PATH.'debugViewer.class.php');

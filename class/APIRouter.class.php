@@ -146,18 +146,12 @@ class APIRouter
 			{
 				switch($routeObjects->section)
 				{
-					case "articles":
-						articlesHelper::getArticles($routeObjects);
-						break;
-					case "news":
-						newsModelHelper::getNews($routeObjects);
-						break;
-					case "article_types":
-						articlesHelper::getArticleTypes($routeObjects);
-						break;
-
-					case "regions": 		return clinicsModelHelper::getRegions($routeObjects);
-					case "clinics": 		return clinicsModelHelper::getClinics($routeObjects);
+					case "articles": 		articlesHelper::getArticles($routeObjects); break;
+					case "news": 			newsModelHelper::getNews($routeObjects); break;
+					case "article_types": 	articlesHelper::getArticleTypes($routeObjects); break;
+					case "regions": 		clinicsModelHelper::getRegions($routeObjects); break;
+					case "clinics": 		clinicsModelHelper::getClinics($routeObjects); break;
+					case "webinars": 		webinarsHelper::getWebinars($routeObjects); break;
 					default:
 						throw new CodesExceptionHandler(1009);
 

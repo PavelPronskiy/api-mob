@@ -16,7 +16,7 @@ class newsModelHelper
 			switch($objects->pathRoute)
 			{
 				case "brief": 			self::getBriefData($objects); break;
-				case "content": 		self::getContentData($objects);  break;
+				case "content": 		self::getContentData($objects); break;
 				case "timeline": 		self::getTimeLine($objects);  break;
 				default:
 					throw new CodesExceptionHandler(1009);
@@ -27,8 +27,8 @@ class newsModelHelper
 
 
 	/**
-	 * news brief by id json
-	 * @param type $newsId
+	 * brief by id json
+	 * @param type $contentId
 	 * @param type $params 
 	 * @return type
 	 */
@@ -47,8 +47,8 @@ class newsModelHelper
 
 
 	/**
-	 * news by id fulltext html
-	 * @param type $newsId
+	 * by id fulltext html
+	 * @param type $contentId
 	 * @param type $params 
 	 * @return type
 	 */
@@ -68,7 +68,6 @@ class newsModelHelper
 
 	/**
 	 * timeline model
-	 * @param type $newsId
 	 * @param type $params 
 	 * @return type
 	 */
@@ -81,7 +80,6 @@ class newsModelHelper
 		if (isset($data->objectList))
 			return dataModelViewer::dataView($data);
 	}
-
 }
 
 ?>

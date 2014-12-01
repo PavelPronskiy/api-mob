@@ -24,7 +24,7 @@ class articlesHelper
 	}
 
 	/**
-	 * data constructor articles
+	 * data constructor
 	 * @param type $objects
 	 * @return type data
 	 */
@@ -35,9 +35,9 @@ class articlesHelper
 		{
 			switch($objects->pathRoute)
 			{
-				case "brief": 			return self::getBriefData($objects);
-				case "content": 		return self::getContentData($objects);
-				case "timeline": 		return self::getTimeLine($objects);
+				case "brief": 			self::getBriefData($objects); break;
+				case "content": 		self::getContentData($objects); break;
+				case "timeline": 		self::getTimeLine($objects);  break;
 				default:
 					throw new CodesExceptionHandler(1009);
 
@@ -47,59 +47,58 @@ class articlesHelper
 
 
 	/**
-	 * article brief by id json
-	 * @param type $articleId
+	 * brief by id json
+	 * @param type $contentId
 	 * @param type $params 
 	 * @return type
 	 */
-	static function getBriefData($data)
+	private static function getBriefData($data)
 	{
-		if (isset($data->contentId))
-			$data->objectList[] = K2Helper::getK2ContentById($data->contentId);
-		else
-			throw new CodesExceptionHandler(1003);
 
-		if ($data->objectList)
+		$K2HelperReturn = K2Helper::getK2ContentById($data->contentId);
+		$data->objectList[] = $K2HelperReturn;
+
+		if ($K2HelperReturn)
 			dataModelViewer::dataView($data);
 		else
 			throw new CodesExceptionHandler(1009);
+
 	}
 
 
 	/**
-	 * article by id fulltext html
-	 * @param type $articleId
+	 * by id fulltext html
+	 * @param type $contentId
 	 * @param type $params 
 	 * @return type
 	 */
-	static function getContentData($data)
+	private static function getContentData($data)
 	{
 
-		if (isset($data->contentId))
-			$data->objectList = K2Helper::getK2ContentById($data->contentId);
-		else
-			throw new CodesExceptionHandler(1003);
-
-		if ($data->objectList)
+		$K2HelperReturn = K2Helper::getK2ContentById($data->contentId);
+		$data->objectList = $K2HelperReturn;
+		
+		if ($K2HelperReturn)
 			dataModelViewer::dataView($data);
 		else
 			throw new CodesExceptionHandler(1009);
+
 	}
 
 
 	/**
 	 * timeline model
-	 * @param type $articleId
 	 * @param type $params 
 	 * @return type
 	 */
-	static function getTimeLine($data)
+	private static function getTimeLine($data)
 	{
 		if (isset($data->categoryId))
 			$data->objectList = K2Helper::getK2TimeLineObjects($data);
 
+
 		if (isset($data->objectList))
-			dataModelViewer::dataView($data);
+			return dataModelViewer::dataView($data);
 	}
 
 }
