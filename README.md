@@ -43,8 +43,8 @@ API-Mob
 
 ## Clinics
 
-	Список всех регионов
-	`GET http://api.project/regions`
+  Список всех регионов
+	GET http://api.project/regions
 
 
 	Список всех клиник
