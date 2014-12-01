@@ -20,6 +20,7 @@ class K2Helper
 		$db->setQuery($sql);
 		$return = $db->loadResult();
 
+
 	
 
 		// empty exception
@@ -104,7 +105,12 @@ class K2Helper
 		AND a.published=1";
 
 		$db->setQuery($sql);
-		return $db->loadObject();
+		$loadObject = $db->loadObject();
+
+		if ($loadObject === NULL)
+			return false;
+		else
+			return $loadObject;
 	}
 
 	static function getK2TimeLineObjects($objects)
@@ -112,7 +118,7 @@ class K2Helper
 		$db = &JFactory::getDBO();
 		$sqlQueryParams = '';
 		$sqlQueryImportant = '';
-
+		$maxIdTimeline = MAX_ID_TIMELINE;
 
 		if (!isset($objects->pathParams->count))
 			$objects->pathParams->count = MAX_COUNT_TIMELINE;
@@ -138,22 +144,20 @@ class K2Helper
 		if (isset($objects->pathParams->max_id) && isset($objects->pathParams->since_id))
 		{
 			if ( ($objects->pathParams->max_id == 0) && ($objects->pathParams->since_id > 0) )
-			{
 				$sqlQueryParams = "AND a.id < {$objects->pathParams->since_id}"; // sort by since_id
-			}
 		}
 
 		if (isset($objects->pathParams->since_id) && $objects->pathParams->since_id == '-1')
-		{
-			$sqlQueryParams = "AND a.id < {MAX_ID_TIMELINE}"; // sort by since_id
-		}
+			$sqlQueryParams = "AND a.id < {$maxIdTimeline}"; // sort by since_id
 
 
 		// important ids not defined in module NEWS_IMPORTANT
-		if (!is_array($objects->importantIdCollection))
+		if (isset($objects->importantIdCollection))
 		{
-			$objects->pathParams->important = 0;
+			if (!is_array($objects->importantIdCollection))
+				$objects->pathParams->important = 0;
 		}
+
 
 		if (isset($objects->pathParams->important) && $objects->pathParams->important == 1)
 		{
@@ -167,9 +171,7 @@ class K2Helper
 		
 		// clinics listing by clinics categories
 		if ( (isset($objects->SQL_ClinicsCategories_ID)) && !empty($objects->SQL_ClinicsCategories_ID) )
-		{
 			$sqlWhere = "a.catid IN ({$objects->SQL_ClinicsCategories_ID})";
-		}
 
 		// sql query collect
 		$sql = "SELECT 
@@ -196,6 +198,7 @@ class K2Helper
 
 	static function getMappingTypes($objects)
 	{
+
 		// mapping alias == id
 		switch($objects)
 		{

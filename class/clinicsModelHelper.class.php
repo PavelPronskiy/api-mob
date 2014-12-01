@@ -72,6 +72,7 @@ class clinicsModelHelper
 			throw new CodesExceptionHandler(1009);
 	}
 
+
 	/**
 	 * get regions by clinics
 	 * @param type 
@@ -112,7 +113,25 @@ class clinicsModelHelper
 
 				$objects->objectList = K2Helper::getK2TimeLineObjects($objects);
 
+				if (isset($objects->objectList) && is_array($objects->objectList))
+					dataModelViewer::dataView($objects);
+				else
+					throw new CodesExceptionHandler(1010);
 
+			break;
+			case "feedbacks":
+				// header('Content-Type: application/json');
+				//RatingHelper::getFeedbacks($objects);
+				$options = '';
+				$RatingSQLHelper = new RatingSQLHelper($options);
+				$objects->objectList = $RatingSQLHelper->getFeedbacks($objects);
+				//print_r($objects->objectList);
+				if (isset($objects->objectList) && is_array($objects->objectList))
+					dataModelViewer::dataView($objects);
+				else
+					throw new CodesExceptionHandler(1010);
+
+			break;
 
 				// sql query organize
 				/* $sql = "SELECT 
@@ -161,13 +180,6 @@ class clinicsModelHelper
 				//header('Content-Type: application/json');
 				//print_r($objects);
 
-				if (isset($objects->objectList) && is_array($objects->objectList))
-					dataModelViewer::dataView($objects);
-				else
-					throw new CodesExceptionHandler(1010);
-
-
-			break;
 		}
 
 

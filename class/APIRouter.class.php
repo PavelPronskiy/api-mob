@@ -12,9 +12,7 @@ class APIRouter
 		try {
 			$returnMethod = new stdClass;
 			$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-			$pathMethods = array_filter(explode(DS, str_replace(URI_API_PREFIX, '', $path)));
-			$getImportantIDSArray = joomlaImports::getImportantIDSArray();
-
+			$pathMethods = array_values(array_filter(explode(DS, $path)));
 
 			// query vars
 			parse_str($_SERVER['QUERY_STRING'], $parse_str);
@@ -24,6 +22,9 @@ class APIRouter
 
 			if (isset($pathMethods[0]))
 				$returnMethod->section = $pathMethods[0];
+			else
+				throw new CodesExceptionHandler(1002);
+
 
 			// example: methodType/categoryAlias
 			// example: methodType/categoryAlias?params
@@ -60,6 +61,7 @@ class APIRouter
 				return $returnMethod;
 			}
 
+			// клиники
 			// content example: /methodType/id/about
 			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
 				isset($pathMethods[2]) && $pathMethods[2] == 'about' && $pathMethods[2] != DS)
@@ -67,6 +69,17 @@ class APIRouter
 				$returnMethod->contentId = $pathMethods[1];
 				$returnMethod->pathRoute = 'about';
 				$returnMethod->dataTypeFormat = 'html';
+				return $returnMethod;
+			}
+
+			// отзывы
+			// content example: /methodType/id/feedbacks
+			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
+				isset($pathMethods[2]) && $pathMethods[2] == 'feedbacks' && $pathMethods[2] != DS)
+			{
+				$returnMethod->contentId = $pathMethods[1];
+				$returnMethod->pathRoute = 'feedbacks';
+				$returnMethod->dataTypeFormat = 'json';
 				return $returnMethod;
 			}
 
@@ -88,7 +101,6 @@ class APIRouter
 				$returnMethod->categoryId = K2Helper::getMappingTypes($pathMethods[0]);
 				$returnMethod->pathRoute = 'timeline';
 				$returnMethod->dataTypeFormat = 'json';
-				$returnMethod->importantIdCollection = $getImportantIDSArray;
 				return $returnMethod;
 			}
 
@@ -108,9 +120,9 @@ class APIRouter
 				$returnMethod->pathParams->max_id = MAX_ID_TIMELINE;
 				$returnMethod->pathParams->since_id = SINCE_ID_TIMELINE;
 				$returnMethod->pathParams->count = MAX_COUNT_TIMELINE;
-				$returnMethod->importantIdCollection = $getImportantIDSArray;
 				return $returnMethod;
 			}
+
 
 			// empty exception
 			if (!isset($returnMethod->pathRoute))
@@ -129,19 +141,34 @@ class APIRouter
 		{
 			$routeObjects = APIRouter::getRouteObjects();
 
-			switch($routeObjects->section)
+
+			if (isset($routeObjects->section))
 			{
-				case "article_types": 	return articlesHelper::getArticleTypes($routeObjects);
-				case "regions": 		return clinicsModelHelper::getRegions($routeObjects);
-				case "clinics": 		return clinicsModelHelper::getClinics($routeObjects);
+				switch($routeObjects->section)
+				{
+					case "articles":
+						articlesHelper::getArticles($routeObjects);
+						break;
+					case "news":
+						newsModelHelper::getNews($routeObjects);
+						break;
+					case "article_types":
+						articlesHelper::getArticleTypes($routeObjects);
+						break;
+
+					case "regions": 		return clinicsModelHelper::getRegions($routeObjects);
+					case "clinics": 		return clinicsModelHelper::getClinics($routeObjects);
+					default:
+						throw new CodesExceptionHandler(1009);
+
+				}
+			}
+			else
+			{
+				throw new CodesExceptionHandler(1009);
 			}
 
-			switch($routeObjects->pathRoute)
-			{
-				case "brief": 			return articlesHelper::getBriefData($routeObjects);
-				case "content": 		return articlesHelper::getContentData($routeObjects);
-				case "timeline": 		return articlesHelper::getTimeLine($routeObjects);
-			}
+
 		}
 		catch (CodesExceptionHandler $e)
 		{

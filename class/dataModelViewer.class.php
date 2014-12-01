@@ -52,7 +52,7 @@ class dataModelViewer
 					{
 						case "brief":
 							$item->id = (int)$dataRow->id;
-							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
+							$item->imageURL = HTTP_HOSTNAME_IMAGES.md5("Image".$dataRow->id).'_M.jpg';
 							$item->rating = RatingHelper::getRatingValues($dataRow->id);
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
@@ -68,9 +68,17 @@ class dataModelViewer
 							$item->location->longitude = K2Helper::getExtrafields(2, $dataRow->extra_fields);
 							$item->since_hits = (int)$dataRow->hits;
 						break;
+						case "feedbacks":
+							$item->id = (int)$dataRow->id;
+							$item->createdAt = date(DATE_FORMAT, $dataRow->created);
+							$item->updatedAt = date(DATE_FORMAT, $dataRow->modified);
+							$item->author = (string)$dataRow->author;
+							$item->text = (string)$dataRow->text;
+							$item->rating = RatingHelper::getRatingStatus($dataRow->status_review);
+						break;
 						case "timeline":
 							$item->id = (int)$dataRow->id;
-							$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
+							$item->imageURL = HTTP_HOSTNAME_IMAGES.md5("Image".$dataRow->id).'_M.jpg';
 							$item->rating = RatingHelper::getRatingValues($dataRow->id);
 							$item->title = $dataRow->title;
 							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
@@ -100,14 +108,18 @@ class dataModelViewer
 					$item->title = $dataRow->name;
 					break;
 				case "news":
+
+					$getImportantIDSArray = joomlaImports::getImportantIDSArray();
+
+
 					$item->id = (int)$dataRow->id;
 					$item->title = $dataRow->title;
 					$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 					$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 					$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-					$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
-					if (isset($objects->importantIdCollection)) $item->important = in_array($dataRow->id, $objects->importantIdCollection, true) ? 'true' : 'false';
-					$item->shareURL = HOSTNAME.DS.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+					$item->imageURL = HTTP_HOSTNAME_IMAGES.md5("Image".$dataRow->id).'_M.jpg';
+					$item->important = in_array($dataRow->id, $getImportantIDSArray, true) ? 'true' : 'false';
+					$item->shareURL = HTTP_HOSTNAME.JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid));
 					break;
 				case "articles":
 					$item->id = (int)$dataRow->id;
@@ -115,8 +127,8 @@ class dataModelViewer
 					$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
 					$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->created));
 					$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->modified));
-					$item->imageURL = HOSTNAME.K2_ITEMS_IMAGES_PATH.md5("Image".$dataRow->id).'_M.jpg';
-					$item->shareURL = HOSTNAME.DS.str_replace(URI_API_PREFIX, '', JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid)));
+					$item->imageURL = HTTP_HOSTNAME_IMAGES.md5("Image".$dataRow->id).'_M.jpg';
+					$item->shareURL = HTTP_HOSTNAME.JRoute::_(K2HelperRoute::getItemRoute($dataRow->id.':'.$dataRow->alias, $dataRow->catid));
 					$item->articleTypeId = (int)$dataRow->catid;
 					break;
 				case "webinars":
@@ -175,8 +187,12 @@ class dataModelViewer
 			break;
 			case "html":
 				header('Content-Type: text/html');
-				$dataText = $objects->objectList->introtext.$objects->objectList->fulltext;
-				$tidy->parseString($dataText, array('show-body-only' => true, 'wrap' => false, 'show-warnings' => false), 'utf8');
+				$tidy->parseString(
+					$objects->objectList->introtext.$objects->objectList->fulltext,
+					array('show-body-only' => true, 'wrap' => false, 'show-warnings' => false),
+				'utf8'
+				);
+
 				$tidy->cleanRepair();
 				debugViewer::view($tidy);
 				echo $tidy->value;

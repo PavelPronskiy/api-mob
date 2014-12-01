@@ -24,6 +24,29 @@ class articlesHelper
 	}
 
 	/**
+	 * data constructor articles
+	 * @param type $objects
+	 * @return type data
+	 */
+
+	static function getArticles($objects)
+	{
+		if (isset($objects->pathRoute))
+		{
+			switch($objects->pathRoute)
+			{
+				case "brief": 			return self::getBriefData($objects);
+				case "content": 		return self::getContentData($objects);
+				case "timeline": 		return self::getTimeLine($objects);
+				default:
+					throw new CodesExceptionHandler(1009);
+
+			}
+		}
+	}
+
+
+	/**
 	 * article brief by id json
 	 * @param type $articleId
 	 * @param type $params 

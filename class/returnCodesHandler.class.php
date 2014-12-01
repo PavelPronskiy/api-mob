@@ -27,6 +27,8 @@ class CodesExceptionHandler extends Exception
 		switch($errorCodeId)
 		{
 			case "1003":
+			case "1009":
+			case "1010":
 				header('HTTP/1.1 404 Not Found');
 				header('Content-Type: application/json');
 			break;
