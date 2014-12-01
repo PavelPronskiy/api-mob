@@ -42,24 +42,16 @@ API-Mob
 
 
 ## Clinics
-
 ###### Список всех регионов
 `GET http://api.project/regions`
-
-Список всех клиник
-	`GET http://api.project/clinics?count={count}&since_id={since_id}&since_hits={since_hits}`
-
-
-	Получение экземпляра клиники по id
-	`GET http://api.project/clinics/{id}`
-
-
-	Получение "О клинике" по id
-	`GET http://api.project/clinics/{id}/about`
-
-
-	Получение коллекции отзывов для клиники с заданным id
-	`GET http://api.project/clinics/{id}/feedbacks?since_id={since_id}&max_id={max_id}&count={count}`
+###### Список всех клиник
+`GET http://api.project/clinics?count={count}&since_id={since_id}&since_hits={since_hits}`
+###### Получение экземпляра клиники по id
+`GET http://api.project/clinics/{id}`
+###### Получение "О клинике" по id
+`GET http://api.project/clinics/{id}/about`
+###### Получение коллекции отзывов для клиники с заданным id
+`GET http://api.project/clinics/{id}/feedbacks?since_id={since_id}&max_id={max_id}&count={count}`
 
 
 
