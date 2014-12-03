@@ -29,10 +29,8 @@ JLoader::register('K2Helper', API_CLASS_PATH.DS.'K2Helper.class.php');
 JLoader::register('clinicsModelHelper', API_CLASS_PATH.DS.'clinicsModelHelper.class.php');
 JLoader::register('ratingSyncer', API_CLASS_PATH.DS.'ratingSyncer.class.php');
 
-
 $options = '';
 $initRating = new ratingSyncer($options);
-
 
 if ($_SERVER['argc'] == '2') {
 	switch ($_SERVER['argv'][1]) {
@@ -41,7 +39,6 @@ if ($_SERVER['argc'] == '2') {
 
 			if (isset($objects->return))
 				print_r($objects);
-
 
 		break;
 		default:

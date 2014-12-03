@@ -151,7 +151,7 @@ class APIRouter
 					case "article_types": 	articlesHelper::getArticleTypes($routeObjects); break;
 					case "regions": 		clinicsModelHelper::getRegions($routeObjects); break;
 					case "clinics": 		clinicsModelHelper::getClinics($routeObjects); break;
-					case "webinars": 		webinarsHelper::getWebinars($routeObjects); break;
+					case "webinars": 		webinarsModelHelper::getWebinars($routeObjects); break;
 					default:
 						throw new CodesExceptionHandler(1009);
 
