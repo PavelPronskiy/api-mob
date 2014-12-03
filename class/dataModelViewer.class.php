@@ -73,7 +73,7 @@ class dataModelViewer
 							$item->createdAt = date(DATE_FORMAT, $dataRow->created);
 							$item->updatedAt = date(DATE_FORMAT, $dataRow->modified);
 							$item->author = (string)$dataRow->author;
-							$item->text = (string)$dataRow->text;
+							$item->text = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->text));
 							$item->rating = RatingHelper::getRatingStatus($dataRow->status_review);
 						break;
 						case "timeline":

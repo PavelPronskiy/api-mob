@@ -28,6 +28,8 @@ class ratingSyncer
 
 	function getRemoteRatingData()
 	{
+
+		$return = array();
 		$sql = "SELECT a.nid, a.id, b.field_clinic_rating_value AS currentValue
 		FROM idevels_probirka_integration AS a
 		LEFT JOIN field_data_field_clinic_rating AS b
@@ -52,6 +54,8 @@ class ratingSyncer
 	{
 		$db = JFactory::getDbo();
 		$modelItem = new stdClass();
+		$timestamp = date("r", time());
+		$items = array();
 
 		foreach ($objects AS $key => $item)
 		{
@@ -65,14 +69,11 @@ class ratingSyncer
 
 				$db->insertObject('#__clinics_rating', $modelItem);
 
-				$items[] = 'Новая клиника: '.$item->id.' добавлена!';
+				$items[] = $timestamp.' | новая клиника: '.$item->id.' добавлена!';
 			}
 		}
 
-		if (!empty($items))
-			return $items;
-		else
-			return 'Новых клиник не было обнаружено!';
+		return $items;
 
 	}
 
@@ -80,9 +81,11 @@ class ratingSyncer
 	{
 		$db = JFactory::getDbo();
 		$modelItem = new stdClass();
+		$items = array();
 
 		$itemRatingClinics = clinicsModelHelper::getAllClinicsRating();
 		$remoteDataRating = $this->getRemoteRatingData();
+		$timestamp = date("r", time());
 
 		foreach ($remoteDataRating AS $remoteItem)
 		{
@@ -97,15 +100,11 @@ class ratingSyncer
 
 				$db->updateObject('#__clinics_rating', $modelItem, 'clinic_id');
 
-				$items[] = $remoteItem->id.' изменено '.$dailyChange;
+				$items[] = $timestamp. ' | '.$remoteItem->id.' изменено '.$dailyChange;
 			}
 		}
 
-
-		if (!empty($items))
-			return $items;
-		else
-			return 'Нет изменений в рейтинге клиник за текущий период';
+		return $items;
 
 	}
 
@@ -117,6 +116,17 @@ class ratingSyncer
 			$data = $this->getRemoteRatingData();
 			$objects->insertClinicsTable = $this->insertClinicsTable($data);
 			$objects->updateClinicsCurrentValue = $this->updateClinicsCurrentValue();
+
+			if (!empty($objects->insertClinicsTable))
+			{
+				$objects->return = true;
+			}
+
+			if (!empty($objects->updateClinicsCurrentValue))
+			{
+				$objects->return = true;
+			}
+
 		}
 		catch (CodesExceptionHandler $e)
 		{
