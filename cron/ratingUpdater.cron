@@ -1,2 +1,2 @@
-0 * */1 * * probirka_api php /srv/www/vhosts/api.probirka.org/httpdocs/ratingUpdater.php -cron >> /srv/www/vhosts/api.probirka.org/httpdocs/log/ratingUpdater.log &> /dev/null
+0 * */1 * * probirka_api php /srv/www/vhosts/api.probirka.org/httpdocs/ratingUpdater.php -cron >> /srv/www/vhosts/api.probirka.org/httpdocs/log/ratingUpdater.log
 
