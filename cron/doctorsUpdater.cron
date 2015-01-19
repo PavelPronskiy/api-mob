@@ -1,0 +1,2 @@
+0 * */1 * * probirka_api php /srv/www/vhosts/api.probirka.org/httpdocs/doctorsUpdater.php -cron >> /srv/www/vhosts/api.probirka.org/httpdocs/log/doctorsUpdater.log
+
