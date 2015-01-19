@@ -101,7 +101,6 @@ class dataModelViewer
 					{
 						case "brief":
 						case "timeline":
-						print_r($objects);
 							$item->id = (int)$dataRow->nid;
 							$item->imageURL = $dataRow->imageURL;
 							$item->fio = $dataRow->fio;
