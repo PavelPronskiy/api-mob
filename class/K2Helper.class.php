@@ -255,7 +255,7 @@ class K2Helper
 						case 2: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // longitude
 						case 5: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // phoneNumber
 						case 7: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // address
-						case 9: if (isset($x->value[1]) AND !empty($x->value[1])) $items = $x->value[1]; break; // webURL
+						case 9: if (isset($x->value[1]) AND !empty($x->value[1])) $items = preg_match('/^http:\/\/$/', $x->value[1]) ? $items = '' : $items = $x->value[1]; break; // webURL
 						case 11: if (isset($x->value) 	AND !empty($x->value)) $items = $x->value; break; // businessHours
 						//default: $items = $x->value; break;
 					}
@@ -266,7 +266,7 @@ class K2Helper
 		if ($items)
 			return $items;
 		else
-			return 'Не заполнено';
+			return 'нет информации';
 	}
 
 
