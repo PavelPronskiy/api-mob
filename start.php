@@ -23,7 +23,7 @@ define('K2_ITEMS_IMAGES_PATH', '/media/k2/items/cache');
 
 define('HTTP_HOSTNAME', 'http://www.probirka.org');
 define('HTTP_IMG_HOSTNAME', 'http://static.probirka.org');
-define('HTTP_HOSTNAME_IMAGES', HTTP_IMG_HOSTNAME.K2_ITEMS_IMAGES_PATH);
+define('HTTP_HOSTNAME_IMAGES', HTTP_IMG_HOSTNAME.K2_ITEMS_IMAGES_PATH.DS);
 
 
 define('NEWS_K2_CATEGORY_ID', 3);
