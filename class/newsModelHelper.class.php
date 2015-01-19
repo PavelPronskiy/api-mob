@@ -11,6 +11,7 @@ class newsModelHelper
 
 	public static function getNews($objects)
 	{
+
 		if (isset($objects->pathRoute))
 		{
 			switch($objects->pathRoute)

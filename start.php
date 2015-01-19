@@ -1,6 +1,6 @@
 <?
 /**
- * API, ver 0.44b
+ * API, ver 0.45b
 **/
 
 error_reporting(E_ALL);
@@ -19,16 +19,18 @@ define('SINCE_ID_TIMELINE', 0);
 define('COUNT_LIMIT_TIMELINE', 100);
 define('CLINICS_SINCE_HITS_TIMELINE', 1000000);
 
-define('K2_ITEMS_IMAGES_PATH', '/media/k2/items/cache/');
+define('K2_ITEMS_IMAGES_PATH', '/media/k2/items/cache');
 
 define('HTTP_HOSTNAME', 'http://www.probirka.org');
-define('HTTP_HOSTNAME_IMAGES', HTTP_HOSTNAME.K2_ITEMS_IMAGES_PATH);
+define('HTTP_IMG_HOSTNAME', 'http://static.probirka.org');
+define('HTTP_HOSTNAME_IMAGES', HTTP_IMG_HOSTNAME.K2_ITEMS_IMAGES_PATH);
 
 
 define('NEWS_K2_CATEGORY_ID', 3);
 define('WEBINARS_K2_CATEGORY_ID', 71);
 define('CLINIC_REGIONS_K2_CATEGORY_ID', 156);
 define('K2_GALLERY_PATH', '/media/k2/galleries/');
+define('K2_GALLERY_PATH_ABSOLUTE', '/srv/www/vhosts/probirka.org/httpdocs'.K2_GALLERY_PATH);
 define('K2_JVERSION', '16');
 
 
@@ -47,6 +49,8 @@ JLoader::register('CodesExceptionHandler', API_CLASS_PATH.'returnCodesHandler.cl
 JLoader::register('newsModelHelper', API_CLASS_PATH.'newsModelHelper.class.php');
 JLoader::register('webinarsModelHelper', API_CLASS_PATH.'webinarsModelHelper.class.php');
 JLoader::register('clinicsModelHelper', API_CLASS_PATH.'clinicsModelHelper.class.php');
+JLoader::register('doctorsModelHelper', API_CLASS_PATH.'doctorsModelHelper.class.php');
+JLoader::register('doctorsSyncer', API_CLASS_PATH.'doctorsSyncer.class.php');
 JLoader::register('dataModelViewer', API_CLASS_PATH.'dataModelViewer.class.php');
 JLoader::register('debugViewer', API_CLASS_PATH.'debugViewer.class.php');
 JLoader::register('joomlaImports', API_CLASS_PATH.'joomlaImports.class.php');

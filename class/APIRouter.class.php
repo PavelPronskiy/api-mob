@@ -72,6 +72,17 @@ class APIRouter
 				return $returnMethod;
 			}
 
+			// доктора
+			// content example: /methodType/id/bio
+			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
+				isset($pathMethods[2]) && $pathMethods[2] == 'bio' && $pathMethods[2] != DS)
+			{
+				$returnMethod->contentId = $pathMethods[1];
+				$returnMethod->pathRoute = 'bio';
+				$returnMethod->dataTypeFormat = 'html';
+				return $returnMethod;
+			}
+
 			// отзывы
 			// content example: /methodType/id/feedbacks
 			if (isset($pathMethods[1]) && ( filter_var($pathMethods[1], FILTER_VALIDATE_INT) !== false ) &&
@@ -95,8 +106,21 @@ class APIRouter
 			)
 			{
 
-				if ($returnMethod->pathParams->since_id == '-1')
-					$returnMethod->pathParams->since_id = MAX_ID_TIMELINE;
+				if (isset($returnMethod->pathParams->since_id))
+				{
+					if ($returnMethod->pathParams->since_id == '-1')
+						$returnMethod->pathParams->since_id = MAX_ID_TIMELINE;
+				}
+				else
+				{
+					$returnMethod->pathParams->since_id = 0;
+				}
+
+				if (!isset($returnMethod->pathParams->max_id))
+				{
+					$returnMethod->pathParams->max_id = MAX_ID_TIMELINE;
+				}
+
 
 				$returnMethod->categoryId = K2Helper::getMappingTypes($pathMethods[0]);
 				$returnMethod->pathRoute = 'timeline';
@@ -141,7 +165,6 @@ class APIRouter
 		{
 			$routeObjects = APIRouter::getRouteObjects();
 
-
 			if (isset($routeObjects->section))
 			{
 				switch($routeObjects->section)
@@ -151,6 +174,7 @@ class APIRouter
 					case "article_types": 	articlesHelper::getArticleTypes($routeObjects); break;
 					case "regions": 		clinicsModelHelper::getRegions($routeObjects); break;
 					case "clinics": 		clinicsModelHelper::getClinics($routeObjects); break;
+					case "doctors": 		doctorsModelHelper::getDoctors($routeObjects); break;
 					case "webinars": 		webinarsModelHelper::getWebinars($routeObjects); break;
 					default:
 						throw new CodesExceptionHandler(1009);

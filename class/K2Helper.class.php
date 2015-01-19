@@ -32,6 +32,24 @@ class K2Helper
 	}
 
 
+	static function getCategoryById($id)
+	{
+
+		$db = &JFactory::getDBO();
+
+		$sql = "SELECT * FROM #__k2_categories";
+		$sql .= " WHERE id='".$id."'";
+		$sql .= " AND published='1'";
+
+		$db->setQuery($sql);
+		$return = $db->loadObject();
+
+		// empty exception
+		if ($return)
+			return $return;
+	}
+
+
 	static function getCategoryTree($objects)
 	{
 
@@ -70,17 +88,17 @@ class K2Helper
 	static function getGallery($id)
 	{
 
-		$galleryPath = K2_GALLERY_PATH.$id;
+		$galleryPath = K2_GALLERY_PATH_ABSOLUTE.$id;
 
-		if (is_dir(JPATH_BASE.$galleryPath))
+		if (is_dir($galleryPath))
 		{
-			$files = scandir(JPATH_BASE.$galleryPath); 
+			$files = scandir($galleryPath); 
 
 			foreach ($files as $key => $file) 
-			{ 
+			{
 				if (!in_array($file, array(".","..")))
 				{ 
-					$items[] = HOSTNAME.K2_GALLERY_PATH.$file;
+					$items[] = HTTP_IMG_HOSTNAME.K2_GALLERY_PATH.$id.'/'.$file;
 				} 
 			} 
 		}
@@ -119,6 +137,7 @@ class K2Helper
 		$sqlQueryParams = '';
 		$sqlQueryImportant = '';
 		$maxIdTimeline = MAX_ID_TIMELINE;
+		$getImportantIDSArray = joomlaImports::getImportantIDSArray();
 
 		if (!isset($objects->pathParams->count))
 			$objects->pathParams->count = MAX_COUNT_TIMELINE;
@@ -152,21 +171,26 @@ class K2Helper
 
 
 		// important ids not defined in module NEWS_IMPORTANT
-		if (isset($objects->importantIdCollection))
+		if (isset($getImportantIDSArray))
 		{
-			if (!is_array($objects->importantIdCollection))
+			if (!is_array($getImportantIDSArray))
 				$objects->pathParams->important = 0;
 		}
 
 
 		if (isset($objects->pathParams->important) && $objects->pathParams->important == 1)
 		{
-			$collectSQLImportant = implode(',', $objects->importantIdCollection);
+			$collectSQLImportant = implode(',', $getImportantIDSArray);
 			$sqlWhere = "a.id IN ({$collectSQLImportant})";
 		}
 		else
 		{
-			$sqlWhere = "a.catid={$objects->categoryId}";
+			if (isset($getImportantIDSArray))
+			{
+				$collectSQLImportant = implode(',', $getImportantIDSArray);
+			}
+
+			$sqlWhere = "a.catid={$objects->categoryId} AND NOT a.id IN ({$collectSQLImportant})";
 		}
 		
 		// clinics listing by clinics categories

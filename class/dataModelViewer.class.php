@@ -43,6 +43,7 @@ class dataModelViewer
 		$items = array();
 		$countObjects = count($objects->objectList);
 
+
 		foreach($objects->objectList as $dataRow)
 		{
 			switch($objects->section)
@@ -94,7 +95,35 @@ class dataModelViewer
 							$item->since_hits = (int)$dataRow->hits;
 						break;
 					}
-
+				case "doctors":
+					switch ($objects->pathRoute)
+					{
+						case "brief":
+						case "timeline":
+							$item->id = (int)$dataRow->nid;
+							$item->imageURL = $dataRow->imageURL;
+							$item->fio = $dataRow->fio;
+							$item->clinicName = $dataRow->clinicName;
+							$item->clinicId = (int)$dataRow->clinicId;
+							$item->regionTitle = $dataRow->regionTitle;
+							$item->regionId = (int)$dataRow->regionId;
+							$item->rating->currentValue = $dataRow->currentValue;
+							$item->rating->dailyChange = (int)$dataRow->dailyChange;
+							$item->feedbackCount = $dataRow->feedbackCount;
+							$item->estimationCount = $dataRow->estimationCount;
+							$item->createdAt = date(DATE_FORMAT, strtotime($dataRow->createdAt));
+							$item->updatedAt = date(DATE_FORMAT, strtotime($dataRow->updatedAt));
+							$item->specialty = $dataRow->specialty;
+						break;
+						case "feedbacks":
+							$item->id = (int)$dataRow->id;
+							$item->createdAt = date(DATE_FORMAT, $dataRow->created);
+							$item->updatedAt = date(DATE_FORMAT, $dataRow->modified);
+							$item->author = (string)$dataRow->author;
+							$item->text = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->text));
+							$item->rating = RatingHelper::getRatingStatus($dataRow->status_review);
+						break;
+					}
 					break;
 				case "regions":
 					$item->id = (int)$dataRow->id;
@@ -108,10 +137,7 @@ class dataModelViewer
 					$item->title = $dataRow->name;
 					break;
 				case "news":
-
 					$getImportantIDSArray = joomlaImports::getImportantIDSArray();
-
-
 					$item->id = (int)$dataRow->id;
 					$item->title = $dataRow->title;
 					$item->brief = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->introtext));
@@ -143,13 +169,13 @@ class dataModelViewer
 				break;
 			}
 
-
+			// wtf
 			if ($countObjects == 1)
 			{
 				return $item;
 			}
 
-
+			// wtf
 			if (isset($item))
 			{
 				$items[] = $item;
@@ -175,6 +201,8 @@ class dataModelViewer
 
 		$item = new stdClass();
 		$tidy = new tidy();
+		$htmlObjects = '';
+		$tidyOptions = array('show-body-only' => true, 'wrap' => false, 'show-warnings' => false);
 
 		switch($objects->dataTypeFormat)
 		{
@@ -186,10 +214,17 @@ class dataModelViewer
 				echo json_encode($dataObjects);
 			break;
 			case "html":
+
+				if (isset($objects->objectList->introtext))
+					$htmlObjects = $objects->objectList->introtext;
+
+				if (isset($objects->objectList->fulltext))
+					$htmlObjects .= $objects->objectList->fulltext;
+
 				header('Content-Type: text/html');
 				$tidy->parseString(
-					$objects->objectList->introtext.$objects->objectList->fulltext,
-					array('show-body-only' => true, 'wrap' => false, 'show-warnings' => false),
+					$htmlObjects,
+					$tidyOptions,
 				'utf8'
 				);
 

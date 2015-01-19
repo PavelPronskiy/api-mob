@@ -125,7 +125,7 @@ class clinicsModelHelper
 				$options = '';
 				$RatingSQLHelper = new RatingSQLHelper($options);
 				$objects->objectList = $RatingSQLHelper->getFeedbacks($objects);
-				//print_r($objects->objectList);
+				
 				if (isset($objects->objectList) && is_array($objects->objectList))
 					dataModelViewer::dataView($objects);
 				else
