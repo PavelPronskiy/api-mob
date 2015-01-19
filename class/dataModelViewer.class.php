@@ -95,11 +95,13 @@ class dataModelViewer
 							$item->since_hits = (int)$dataRow->hits;
 						break;
 					}
+					break;
 				case "doctors":
 					switch ($objects->pathRoute)
 					{
 						case "brief":
 						case "timeline":
+						print_r($objects);
 							$item->id = (int)$dataRow->nid;
 							$item->imageURL = $dataRow->imageURL;
 							$item->fio = $dataRow->fio;
