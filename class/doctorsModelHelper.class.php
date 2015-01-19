@@ -21,9 +21,6 @@ class doctorsModelHelper
 		$db->setQuery($sql);
 		$ret = $db->loadObject();
 		$out = isset($ret->nid) ? $ret : false;
-
-
-
 		return $out;
 	}
 
@@ -43,7 +40,6 @@ class doctorsModelHelper
 		$db->setQuery($sql);
 		$ret = $db->loadObject();
 		$out = isset($ret->nid) ? $ret : false;
-
 		return $out;
 	}
 
@@ -118,8 +114,6 @@ class doctorsModelHelper
 		$objects->sqlQueryReturn = $db->setQuery($sql);
 		$objects->objectList = $db->loadObjectList(); 
 
-		//header('Content-Type: application/json');
-		//print_r($objects->objectList);
 		if ($objects->objectList)
 			return $objects->objectList;
 	}
@@ -133,7 +127,6 @@ class doctorsModelHelper
 	static function getDoctors($objects)
 	{
 		$doctorsSyncer = new doctorsSyncer($objects);
-
 		switch ($objects->pathRoute)
 		{
 			case "bio":
@@ -142,7 +135,6 @@ class doctorsModelHelper
 					dataModelViewer::dataView($objects);
 				else
 					throw new CodesExceptionHandler(1009);
-
 			break;
 			case "brief":
 				$objects->objectList[] = self::getDoctorByNid($objects->contentId);
@@ -153,30 +145,18 @@ class doctorsModelHelper
 			break;
 			case "timeline":
 				$objects->objectList = self::getDoctorsTimeLineObjects($objects);
-
-				//print_r($objects->timeline);
-				//$objects->objectList = K2Helper::getK2TimeLineObjects($objects);
-
 				if (isset($objects->objectList) && is_array($objects->objectList))
 					dataModelViewer::dataView($objects);
-				else
-					throw new CodesExceptionHandler(1010);
-
 			break;
 			case "feedbacks":
-				// header('Content-Type: application/json');
-				//RatingHelper::getFeedbacks($objects);
 				$options = '';
 				$RatingSQLHelper = new RatingSQLHelper($options);
 				$objects->objectList = $RatingSQLHelper->getFeedbacks($objects);
-				
 				if (isset($objects->objectList) && is_array($objects->objectList))
 					dataModelViewer::dataView($objects);
 				else
 					throw new CodesExceptionHandler(1010);
-
 			break;
-
 		}
 	}
 }
