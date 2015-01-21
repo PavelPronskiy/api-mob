@@ -111,10 +111,6 @@ class APIRouter
 					if ($returnMethod->pathParams->since_id == '-1')
 						$returnMethod->pathParams->since_id = MAX_ID_TIMELINE;
 				}
-				else
-				{
-					$returnMethod->pathParams->since_id = 0;
-				}
 
 				if (!isset($returnMethod->pathParams->max_id))
 				{

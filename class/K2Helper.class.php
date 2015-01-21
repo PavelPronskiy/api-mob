@@ -20,9 +20,6 @@ class K2Helper
 		$db->setQuery($sql);
 		$return = $db->loadResult();
 
-
-	
-
 		// empty exception
 		if ($return)
 			return $return;
@@ -211,10 +208,6 @@ class K2Helper
 
 		$objects->sqlQueryReturn = $db->setQuery($sql);
 		$objects->objectList = $db->loadObjectList();
-
-		//header('Content-Type: application/json');
-		//print_r($objects->sqlQueryReturn);
-
 
 		if ($objects->objectList)
 			return $objects->objectList;
