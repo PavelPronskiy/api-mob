@@ -4,6 +4,12 @@
 class doctorsModelHelper
 {
 
+	function __construct()
+	{
+		$options = '';
+		$this->RatingSQLHelper = new RatingSQLHelper($options);
+		//print_r($this->RatingSQLHelper);
+	}
 
 	/**
 	 * get doctor by nid
@@ -66,7 +72,7 @@ class doctorsModelHelper
 			return false;
 	}
 
-	static function getDoctorsTimeLineObjects($objects)
+	function getDoctorsTimeLineObjects($objects)
 	{
 		$db = JFactory::getDBO();
 		$sqlQueryParams = '';
@@ -124,13 +130,12 @@ class doctorsModelHelper
 	 * @param type 
 	 * @return type
 	 */
-	static function getDoctors($objects)
+	function getDoctors($objects)
 	{
-		$doctorsSyncer = new doctorsSyncer($objects);
 		switch ($objects->pathRoute)
 		{
 			case "bio":
-				$objects->objectList = $doctorsSyncer->getDoctorBio($objects);
+				$objects->objectList = $this->RatingSQLHelper->getDoctorBio($objects);
 				if (isset($objects->objectList->entity_id))
 					dataModelViewer::dataView($objects);
 				else
@@ -149,9 +154,8 @@ class doctorsModelHelper
 					dataModelViewer::dataView($objects);
 			break;
 			case "feedbacks":
-				$options = '';
-				$RatingSQLHelper = new RatingSQLHelper($options);
-				$objects->objectList = $RatingSQLHelper->getFeedbacks($objects);
+				$objects->objectList = $this->RatingSQLHelper->getDoctorsFeedbacksTimeLine($objects->contentId)->data;
+
 				if (isset($objects->objectList) && is_array($objects->objectList))
 					dataModelViewer::dataView($objects);
 				else

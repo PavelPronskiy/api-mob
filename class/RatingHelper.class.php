@@ -22,16 +22,15 @@ class RatingHelper
 		return $item;
 	}
 
-	static function getRatingStatus($status_id)
+	function getRatingStatus($status_id)
 	{
 		switch ($status_id)
 		{
-			case "1": 	$status = 'Отрицательно';
-			case "2": 	$status = 'Положительно';
-			default: 	$status = 'Нейтрально';
+			case 2: 	return 'Отрицательно';
+			case 1: 	return 'Положительно';
+			case 0: 	return 'Нейтрально';
+			default: 	return 'Не указано';
 		}
-
-		return $status;
 	}
 
 }

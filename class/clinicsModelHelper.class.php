@@ -80,8 +80,6 @@ class clinicsModelHelper
 	 */
 	static function getClinics($objects)
 	{
-		$db = &JFactory::getDBO();
-
 		switch ($objects->pathRoute)
 		{
 			case "about":

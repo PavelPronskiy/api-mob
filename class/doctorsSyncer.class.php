@@ -25,33 +25,10 @@ class doctorsSyncer
 		$this->options = $options;
 		$this->dataReturned = new stdClass();
 		$ret = new stdClass();
-		$this->K2Helper = new K2Helper();	
+		$this->K2Helper = new K2Helper();
+		$this->RatingSQLHelper = new RatingSQLHelper($options);
 	}
 
-
-	/*
-	*
-	* require getDoctorsData
-	*/
-	function getFeedbacks($object)
-	{
-		$sql = "SELECT 
-			a.cid AS cid,
-			a.subject AS name,
-			b.comment_body_value AS comment
-		FROM comment AS a
-		LEFT JOIN field_data_comment_body AS b
-		ON (a.cid=b.entity_id)
-		WHERE a.nid = {$object->nid}
-		AND a.status = '1'
-		ORDER BY a.changed ASC";
-
-		$this->db->setQuery($sql);
-		$ret->data = $this->db->loadObjectList();
-		$ret->count = count($ret->data);
-		
-		return $ret;
-	}
 
 	function getDoctorBio($objects)
 	{
@@ -127,7 +104,7 @@ class doctorsSyncer
 				$ret->{$k}->regionId = $getClinic->catid;
 				$ret->{$k}->currentValue = isset($item->currentValue) ? $item->currentValue : 0;
 				$ret->{$k}->dailyChange = 0;
-				$ret->{$k}->feedbackCount = $this->getFeedbacks($item)->count;
+				$ret->{$k}->feedbackCount = $this->RatingSQLHelper->getDoctorsFeedbacks($item->nid)->count;
 				$ret->{$k}->estimationCount = $item->estimationCount;
 				$ret->{$k}->updatedAt = $item->updatedAt;
 				$ret->{$k}->createdAt = $item->createdAt;

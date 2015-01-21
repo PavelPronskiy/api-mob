@@ -164,6 +164,7 @@ class APIRouter
 		try
 		{
 			$routeObjects = APIRouter::getRouteObjects();
+			$doctorsModelHelper = new doctorsModelHelper();
 
 			if (isset($routeObjects->section))
 			{
@@ -174,7 +175,7 @@ class APIRouter
 					case "article_types": 	articlesHelper::getArticleTypes($routeObjects); break;
 					case "regions": 		clinicsModelHelper::getRegions($routeObjects); break;
 					case "clinics": 		clinicsModelHelper::getClinics($routeObjects); break;
-					case "doctors": 		doctorsModelHelper::getDoctors($routeObjects); break;
+					case "doctors": 		$doctorsModelHelper->getDoctors($routeObjects); break;
 					case "webinars": 		webinarsModelHelper::getWebinars($routeObjects); break;
 					default:
 						throw new CodesExceptionHandler(1009);

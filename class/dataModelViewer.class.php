@@ -118,11 +118,11 @@ class dataModelViewer
 						break;
 						case "feedbacks":
 							$item->id = (int)$dataRow->id;
-							$item->createdAt = date(DATE_FORMAT, $dataRow->created);
-							$item->updatedAt = date(DATE_FORMAT, $dataRow->modified);
+							$item->createdAt = date(DATE_FORMAT, $dataRow->createdAt);
+							$item->updatedAt = date(DATE_FORMAT, $dataRow->updatedAt);
 							$item->author = (string)$dataRow->author;
 							$item->text = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->text));
-							$item->rating = RatingHelper::getRatingStatus($dataRow->status_review);
+							$item->rating = RatingHelper::getRatingStatus($dataRow->reviews);
 						break;
 					}
 					break;

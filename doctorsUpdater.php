@@ -28,6 +28,7 @@ require_once(JPATH_BASE.DS.'includes'.DS.'framework.php');
 // registering classes
 JLoader::register('JDatabase', JPATH_BASE.DS.'libraries'.DS.'joomla'.DS.'database'.DS.'database.php');
 JLoader::register('K2Helper', API_CLASS_PATH.DS.'K2Helper.class.php');
+JLoader::register('RatingSQLHelper', API_CLASS_PATH.DS.'RatingSQLHelper.class.php');
 JLoader::register('doctorsModelHelper', API_CLASS_PATH.DS.'doctorsModelHelper.class.php');
 JLoader::register('doctorsSyncer', API_CLASS_PATH.DS.'doctorsSyncer.class.php');
 
