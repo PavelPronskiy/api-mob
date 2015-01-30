@@ -26,6 +26,22 @@ class APIRouter
 				throw new CodesExceptionHandler(1002);
 
 
+			// search
+			if (isset($returnMethod->pathParams->name))
+			{
+				if (!isset($returnMethod->pathParams->sort_type))
+					$returnMethod->pathParams->sort_type = 'abc';
+
+				if (!isset($returnMethod->pathParams->region))
+					$returnMethod->pathParams->region = 'vsya-rossiya';
+
+
+				$returnMethod->pathRoute = 'search';
+				$returnMethod->dataTypeFormat = 'json';
+				return $returnMethod;
+			}
+
+
 			// example: methodType/categoryAlias
 			// example: methodType/categoryAlias?params
 			if ( isset($pathMethods[0]) && isset($pathMethods[1]) && (filter_var($pathMethods[1], FILTER_VALIDATE_INT) === false) )
@@ -38,6 +54,8 @@ class APIRouter
 				if (!isset($returnMethod->pathParams->count)) $returnMethod->pathParams->count = MAX_COUNT_TIMELINE;
 				return $returnMethod;
 			}
+
+
 
 			// brief example: /methodType/id
 			if (
@@ -143,7 +161,6 @@ class APIRouter
 				return $returnMethod;
 			}
 
-
 			// empty exception
 			if (!isset($returnMethod->pathRoute))
 			throw new CodesExceptionHandler(1006);
@@ -161,6 +178,7 @@ class APIRouter
 		{
 			$routeObjects = APIRouter::getRouteObjects();
 			$doctorsModelHelper = new doctorsModelHelper();
+
 
 			if (isset($routeObjects->section))
 			{

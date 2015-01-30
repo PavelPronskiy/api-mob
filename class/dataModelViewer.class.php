@@ -43,7 +43,6 @@ class dataModelViewer
 		$items = array();
 		$countObjects = count($objects->objectList);
 
-
 		foreach($objects->objectList as $dataRow)
 		{
 			switch($objects->section)
@@ -77,6 +76,7 @@ class dataModelViewer
 							$item->text = str_replace(array("\r\n","\r"), "", strip_tags($dataRow->text));
 							$item->rating = RatingHelper::getRatingStatus($dataRow->status_review);
 						break;
+						case "search":
 						case "timeline":
 							$item->id = (int)$dataRow->id;
 							$item->imageURL = HTTP_HOSTNAME_IMAGES.md5("Image".$dataRow->id).'_M.jpg';

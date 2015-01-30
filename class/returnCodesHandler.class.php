@@ -20,7 +20,9 @@ class CodesExceptionHandler extends Exception
 			array('1007', 'Empty timeline items'),
 			array('1008', 'Internal error'),
 			array('1009', 'Item not found'),
-			array('1010', 'Clinics not found')
+			array('1010', 'Clinics not found'),
+			array('1011', 'sort_type not defined'),
+			array('1012', 'region not defined')
 		);
 	
 		// set web server code status

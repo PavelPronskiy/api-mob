@@ -3,7 +3,7 @@
 class RatingSQLHelper
 {
 
-	function __construct($options)
+	function __construct()
 	{
 		$option = array();
 		$option['driver']   = 'mysqli';
@@ -15,7 +15,6 @@ class RatingSQLHelper
 
 		$db = JDatabase::getInstance($option);
 		$this->db = $db;
-		$this->options = $options;
 		$this->dataReturned = new stdClass();
 		$ret = new stdClass();
 		$this->K2Helper = new K2Helper();

@@ -1,9 +1,10 @@
 <?
 /**
- * API, ver 0.45.1b
+ * API, ver 0.46.0b
 **/
 
 error_reporting(E_ALL);
+setlocale(LC_ALL, 'ru_RU.UTF-8');
 
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);

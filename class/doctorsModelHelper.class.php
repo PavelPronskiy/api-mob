@@ -7,7 +7,7 @@ class doctorsModelHelper
 	function __construct()
 	{
 		$options = '';
-		$this->RatingSQLHelper = new RatingSQLHelper($options);
+		$this->RatingSQLHelper = new RatingSQLHelper();
 		//print_r($this->RatingSQLHelper);
 	}
 

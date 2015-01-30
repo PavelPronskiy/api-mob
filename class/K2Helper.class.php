@@ -24,7 +24,7 @@ class K2Helper
 		if ($return)
 			return $return;
 		else
-			throw new CodesExceptionHandler(1006);
+			return false;
 		
 	}
 
@@ -44,6 +44,8 @@ class K2Helper
 		// empty exception
 		if ($return)
 			return $return;
+		else
+			return false;
 	}
 
 
@@ -76,9 +78,7 @@ class K2Helper
 		if ($objects->objectList)
 			return $objects->objectList;
 		else
-			throw new CodesExceptionHandler(1006);
-
-		
+			return false;		
 	}
 
 
@@ -194,6 +194,7 @@ class K2Helper
 		if ( (isset($objects->SQL_ClinicsCategories_ID)) && !empty($objects->SQL_ClinicsCategories_ID) )
 			$sqlWhere = "a.catid IN ({$objects->SQL_ClinicsCategories_ID})";
 
+
 		// sql query collect
 		$sql = "SELECT 
 			a.id, a.alias, a.catid, a.title, a.introtext,
@@ -207,6 +208,8 @@ class K2Helper
 		LIMIT 0,{$objects->pathParams->count}";
 
 		$objects->sqlQueryReturn = $db->setQuery($sql);
+		
+		//return $objects->sqlQueryReturn;
 		$objects->objectList = $db->loadObjectList();
 
 		if ($objects->objectList)
